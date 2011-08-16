@@ -38,7 +38,7 @@ gauntlet() {
         done
     done
     if [ "${BADNESS}" = "false" ]; then
-        hilite "All tests passed: '$*'"
+        hilite "All tests passed: $*";
         return 0
     else
         return 1
