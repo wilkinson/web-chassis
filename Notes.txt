@@ -1,0 +1,224 @@
+NOTES:
+    -   I need to read the ES5 standard more closely!
+        -   arguments objects now have map and reduce methods I never noticed
+
+    -   JSON serialization can be altered Smalltalk-style by hiding toJSON
+        methods on the objects to be serialized ...
+
+    -   I need to have two versions of q.detect:
+        -   a version that memoizes results for speed
+        -   a version that acts as shorthand when awaiting global definitions
+            such as jQuery ...
+
+        Also, I need to finish the rewrite for my "webpage.rb" script.
+
+    -   Interesting abbreviation: "aviator" --> "av8r" :-P
+
+    -   Fixed a bug that was VERY difficult to find. I was memoizing the result
+        of a detector check -- does the global property ___ exist? I memoized
+        directly onto the function, and unfortunately I happened to memoize a
+        property named "arguments" directly onto the function, which is _NOT_
+        kosher in strict mode. Strict mode failures are often silent (WTF), so
+        that took me a while and may very well be the reason Elevate wasn't
+        working so that I had to rewrite everything as Aviator anyway. ARGH.
+
+    -   Is a q.read function necessary or even desirable?
+
+    -   Need to decide if Duck.prototype.toNumber should use this def instead:
+            Duck.prototype.toNumber = function () {
+                return (new Number(this.raw)).valueOf();
+            };
+
+    -   New idea to speed up and slim down Part I:
+        Since Part II defines "base", and we'll 'include' it in Part III, we
+        can go ahead and define some quick iterators like "q.map" etc. in PI
+        and simply overwrite them later. This would perhaps even allow us to
+        use the generic techniques to extend pre-existing routines dynamically.
+
+    -   The JIT compilers seem to slow down Spidermonkey, now that I've learned
+        how to compile it and write cleaner code ...
+        -   To turn them back on, use "-m -j -U" as options ...
+
+    -   Although it's unusual to see shell scripts with semicolons after each
+        line, I have written Chassis in such a style for two reasons:
+        -   it's easier for JS programmers to understand,
+        -   it's more explicit, which may enable the shell to run it faster.
+        In any case, the program _does_ seem to be a little faster than it was,
+        because it's continuing to run at its "peak" performance, which it
+        usually only does for a little while (and only after the machine has
+        _just_ restarted ...). Its performance may also have increased in part
+        due to JIT compilation of the block comment by the JS interpreters? I
+        really don't know why such a simple tweak appears to have improved the
+        performance, but it really does seem to have helped ...
+
+    -   Potential name alternatives:
+        bonkers, brigade, buffalo, cambria, cricket, elastic, express, fermata,
+        hemiola, karoshi, lunatic, mission, mustang, plastic, roswell, salmiac,
+        shaman_, sleeper, tzigane, vertigo
+
+    -   A major downside to using POSIX shell scripts vs. Bash -- no local
+        variables! See http://goo.gl/FtiaR .
+
+PREVIOUS PREAMBLE:
+
+#   This standards-compliant JavaScript program also contains an "embedded"
+#   shell script that JS treats as a block comment; if blessed with executable
+#   permissions, this file can actually bootstrap itself as-is, using only a
+#   POSIX shell to search for known JS interpreters and forward its arguments.
+#   Running "server-side JS" programs is a mixed bag at best, though; I highly
+#   recommend migrating to a fully browser-based workflow, where features like
+#   UTF-8 character encoding and JIT compilation are standard, not optional.
+#
+#   The entire project, including source code, documentation, publications,
+#   and the rest will be fully open-sourced soon, once I pick a license :-)
+
+FEATURE REQUESTS:
+
+    -   I need to revisit the q.load mechanism, because even though Safari 5.1
+        actually supports ES5 methods, it isn't running code out of order like
+        every other JS implementation (including "jsc"!) does ...
+
+    -   I need to write some guards for it so that it won't die if it tries to
+        load itself, i.e. $ bash bin/web-chassis.js bin/web-chassis.js ...
+
+    -   Obsolete REBOL ;-)
+
+    -   Write a demo that defines a FakeCPU object that wraps Web Workers and
+        allows for concurrency. The real trick will be mapping it onto blocking
+        execution models, but some server-side implementations like Node.js
+        support this sort of thing anyway, so it seems very possible ...
+        (Additionally, it may be useful to write a POSIX C threading demo ...)
+
+    -   Quit making functions inside of loops ...
+
+    -   Add the ability to use Number.{toExponential,toPrecision} to q.format.
+
+    -   Finish the work in generic.registerType regarding Array-Like Objects!!!
+
+    -   Idea for "lib||die", so that JSLint won't keep freaking out on us:
+            var ns = q.lib("base") || q.die(); // ???
+
+    -   Is color awareness possible (or necessary) in the terminal?
+
+    -   Allow external libraries such as jQuery to be used as dependencies by
+        using "q" itself as a callback function. Then, make sure that, when "q"
+        is used as a callback function, the reactor will still trigger so that
+        the functions that depended on the external library will have another
+        chance to run. Additionally, find a simple way to make sure that we
+        won't recurse too deeply on a re-trigger, because blocking versions of
+        JS (i.e. server-side JS w/o an AJAX layer) could potentially exhaust
+        the stack limit otherwise ...
+
+    -   Allow for both "task-level" and "data-level" parallelization using the
+        event loop's "die" mechanism.
+
+    -   I noticed that SpiderMonkey has a "putstr" function that works like its
+        "print" function except that it doesn't append a newline.
+
+KNOWN ISSUES:
+
+    -   SHOOT -- Strings maybe shouldn't act like Array-Like Objects after all,
+        because it's causing recursion issues for my "math" module ...
+
+    -   I am now finding use cases for generics that are curried with my
+        "preposition" pattern. The following is one potential solution:
+            q.filter(Array)(RegExp).def = function (x1) { ... (x2) ... };
+
+    -   index_of: give "regular" lookup precedence over "special" lookup?
+
+    -   I can probably eliminate a lot of the "global." prefixes, when they
+        are protected by conditionals that keep other implementations out.
+
+OTHER:
+    -   V8 has a GitHub mirror now:
+            http://code.google.com/p/v8/wiki/UsingGit
+
+    -   Interesting flags to use with SpiderMonkey:
+
+            -b  turns on timing statistics :-)
+
+    -   Interesting flags to try more with V8 sample shell (v8):
+
+            --always_full_compiler
+
+            --always_opt
+
+            --max_executable_size 1 # limits executable memory usage to < 1 MB
+
+            --opt_eagerly
+
+            --strict
+                NOTE: http://code.google.com/p/v8/issues/detail?id=1511
+
+            --prof
+                NOTE: http://code.google.com/p/v8/wiki/V8Profiler
+
+    -   Some of the different interpreters have "-strict" or "--strict" flags,
+        and although I assume these are for "linting" purposes, they don't seem
+        to work correctly in some cases, and that really bothers me. Rhino's
+        only seems to give me errors for the '"use strict";' pragma, which it
+        says has no side effect. Honestly, the entire program should be running
+        differently, on a meta-level, so they should reconsider what they call
+        "side effects" :-P
+
+    -   What the heck? The D8 shell removed the global arguments object at
+        some point circa version 3.4.4, but it re-appeared in 3.4.7, at which
+        point I had already kicked my directions over to using an identical
+        invocation as the V8 sample shell. Since the current method works for
+        both cases, I'm playing it safe and leaving it alone for right now ...
+
+    -   I removed support for running directly with PhantomJS because it's its
+        own strange beast for a different purpose. It's not a browser or a
+        terminal, and it has not yet reached a level of maturity or popularity
+        that would warrant the trouble on my part to fix its invocation :-P
+
+            #   phantomjs)
+            #     # PhantomJS 1.2.0 -- requires an external cat ... :-(
+            #       ${JS} <(echo 'phantom.exit();' | cat ${Q} ${ARGV} -)
+            #       ;;                              #-  http://goo.gl/eR1J9
+
+    -   I found another test that separates RingoJS from the others when I'm
+        trying to detect the global object's location:
+
+            (function () {
+                if (this.hasOwnProperty("Object")) {
+                    return this;
+                } else {
+                    return Object.getPrototypeOf(this);
+                }
+            }.call(null));
+
+    -   Interesting snippet I found:
+            alert ${Q:=
+                $(read -ra ARGV <<< "${ARGV}"
+                echo ${ARGV[0]}
+                ARGV="${ARGV[@]}")}
+
+ // Because sequential ordering is important when arguments are separated by
+ // spaces, and because a URL cannot contain spaces anyway, it makes the most
+ // sense not to allow key-value arguments to be separated by spaces. Then, I
+ // am free to use my usual "ply" iterator for parsing as long as I use the
+ // convention that named arguments are entered as key=value pairs, and that
+ // all other arguments will be interpreted as key=true.
+
+    -   The older version of q.base$zip(Array).def:
+
+     /*
+        q.base$zip(Array).def = function (x) {
+            return {
+                using: function (f) {
+                    var n = q.base$reduce(x).using(function (a, b) {
+                        return (a.length < b.length) ? a : b;
+                    }).length;
+                    return q.base$map(q.base$seq(0, n, 1)).using(function (j) {
+                        return f.apply(this, q.base$map(x).using(function (r) {
+                            return r[j];
+                        }));
+                    });
+                }
+            };
+        };
+     */
+
+
+EOF

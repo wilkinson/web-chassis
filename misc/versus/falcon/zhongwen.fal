@@ -1,0 +1,16 @@
+//- Falcon source code
+
+//- zhongwen.fal ~~
+//                                                          ~~ SRW, 12 Aug 2011
+
+(function(arguments)
+
+    message = [20320, 22909, 21527, 63];
+
+    decoded = [].comp(message, {each => chr(each)});
+
+    printl("".merge(decoded));
+
+end)(args);
+
+//- vim:set syntax=falcon:

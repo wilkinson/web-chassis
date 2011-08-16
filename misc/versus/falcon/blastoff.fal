@@ -1,0 +1,16 @@
+//- Falcon source code
+
+//- blastoff.fal ~~
+//                                                          ~~ SRW, 12 Aug 2011
+
+(function(arguments)
+
+    countdown = function(n)
+        return {n => 1 <= n ? " ... ".join(n, fself(n - 1)) : "Blastoff!"}(n);
+    end
+
+    printl(countdown(10));
+
+end)(args)
+
+//- vim:set syntax=falcon:

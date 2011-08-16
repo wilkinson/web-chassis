@@ -1,0 +1,15 @@
+//usr/bin/env falcon $0 $*; exit
+
+//- hello.fal ~~
+//
+//  The obligatory first program in the Falcon language, tested on Ubuntu Lucid.
+//
+//                                                          ~~ SRW, 12 Jun 2010
+
+(function(arguments)
+
+    printl("Hello world!");
+
+end)(args);
+
+//- vim:set syntax=falcon:
