@@ -25,11 +25,13 @@ chassis(function (q) {
 chassis(function (q) {
     "use strict";
 
+    q.lib("base") || q.die();
+
     q.demo = function () {
 
-        var Duck = q.duck().constructor;
+        var Duck = q.base$duck(null).constructor;
 
-        q.demo$hello = q.generic();
+        q.demo$hello = q.base$generic();
 
         q.demo$hello(Duck).def = function (x) {
             q.puts("Hello, Duckling!");

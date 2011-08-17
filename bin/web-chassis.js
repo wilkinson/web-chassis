@@ -4,7 +4,7 @@
 #
 #   (LICENSE AND PREAMBLE GO HERE ...)
 #
-#                                                       ~~ (c) SRW, 09 Aug 2011
+#                                                       ~~ (c) SRW, 16 Aug 2011
 
 if test -n "${ZSH_VERSION+set}" && (emulate sh) >/dev/null 2>&1; then
     emulate sh;
@@ -39,7 +39,7 @@ usage() {
     -v, --version                       print version number and exit
     -*, --*                             all other options pass directly to JS";
     printf '%s %s.\n' 'Full documentation is available online at' \
-        'http://web-chassis.googlecode.com';
+        'https://web-chassis.googlecode.com';
     exit $1;
 }
 
@@ -68,7 +68,7 @@ while getopts ":-:hv" option; do
 done
 
 ENVJS=${JS};
-JS=$(available ${JS} jsc js d8 v8 node rhino ringo narwhal);
+JS=$(available ${JS} js jsc d8 v8 node rhino ringo narwhal);
 SHORTJS="${JS##*\/}";
 Q=$0;
 ARGV="$*";
@@ -130,71 +130,17 @@ esac
 
  // Constructors (these would get lifted to the top of the scope anyway ...)
 
-    function Duck(x) {
-        this.raw = x;
-    }
-
     function TryAgainLater(message) {
         this.message = message || "Dying ...";
     }
-
-    Duck.prototype.isArrayLike = function () {
-        var raw = this.raw;
-        switch (typeof raw) {
-        case "string":
-            return true;            //- need to revisit this later!
-        case "object":
-            return ((raw !== null) && (raw.hasOwnProperty("length")));
-        default:
-            return false;
-        }
-    };
-
-    Duck.prototype.has = function (type, name) {
-        return ((this.raw !== null)                 &&
-                (typeof this.raw !== 'undefined')   &&
-                (typeof this.raw[name] === type)
-        );
-    };
-
-    Duck.prototype.isObjectLike = function () {
-        return (this.raw instanceof Object);
-    };
-
-    Duck.prototype.toNumber = function () {
-        return parseFloat(this.raw);
-    };
 
     TryAgainLater.prototype = new Error();
 
  // Private declarations
 
-    var a$indexOf, a$ply, duck, generic, guts, index_of, key_gen,
-        known_types, q, revive, stack;
+    var a$ply, q, revive, stack;
 
  // Private definitions
-
-    a$indexOf = function (x, y) {
-        if (typeof Array.prototype.indexOf === 'function') {
-            a$indexOf = function (x, y) {
-                return Array.prototype.indexOf.call(y, x);
-            };
-        } else {
-            a$indexOf = function (x, y) {
-                var done, i, index;
-                done = false;
-                index = -1;
-                for (i = 0; (!done) && (i < y.length); i += 1) {
-                    if (x === y[i]) {
-                        done = true;
-                        index = i;
-                    }
-                }
-                return index;
-            };
-        }
-        return a$indexOf(x, y);
-    };
 
     a$ply = function (x, f) {
         if (typeof Array.prototype.forEach === 'function') {
@@ -215,108 +161,6 @@ esac
         a$ply(x, f);
     };
 
-    duck = function (x) {
-        return new Duck(x);
-    };
-
-    generic = function generic() {
-        var f;
-        f = function self() {
-            return guts.apply(self, arguments);
-        };  
-        f.constructor = generic;
-        f.def = {};
-        return f;
-    };  
-
-    generic.registerType = function (x) {
-        if (a$indexOf(x, known_types) !== (-1)) {
-            known_types.push(x);
-        }
-    };
-
-    guts = function () {
-     // This is the "fake prototype" for all generic functions. Yes, I do
-     // force you to use nine named arguments or less. Fork it ;-)
-     // NOTE: Generic functions cannot currently be defined for functions
-     // that expect zero input arguments. I will deal with this soon.
-        var args, def, i, key, n, temp;
-        args = Array.prototype.slice.call(arguments, 0, 9);
-        key  = key_gen(args);
-        n    = args.length;
-        def  = this.def;
-        if (key.special === true) {
-            return Object.defineProperty({}, "def", {
-                configurable: false,
-                enumerable:   false,
-                get: function () {
-                    return def[key.index];
-                },
-                set: function (g) {
-                    def[key.index] = g;
-                }
-            });
-        }
-        if (typeof def[key.index] === 'function') {
-            return def[key.index].apply(this, args);
-        }
-     // Try converting the arguments to Duck types ...
-        temp = [];
-        a$ply(args, function (key, val) {   //- a MAP PATTERN
-            temp[key] = duck(val);
-        });
-        key = key_gen(temp);
-        if (typeof def[key.index] === 'function') {
-            return def[key.index].apply(this, temp);
-        }
-     // We're not ever supposed to fall this far, but if we do, we'll try
-     // to offer some helpful debugging advice. (This may be removed ...)
-        temp = [];
-        for (i = 0; i < n; i += 1) {
-            temp[i] = Function;
-        }
-        if (key_gen(temp).index === key_gen(args).index) {
-            throw new Error("Unregistered type" + ((n > 1) ? "s" : ""));
-        } else {
-            throw new Error("No definition found (" + this + ").");
-        }
-    };
-
-    key_gen = function (x) {
-        var special, y;
-        special = true;
-        y = [];
-        a$ply(x, function (key, val) {
-            var temp = index_of(val);
-            special = (special && temp.special);
-            y[key] = temp.index;
-        });
-        return {
-            special:    special,
-            index:      y.join("-")
-        };
-    };
-
-    known_types = [
-     // These are listed in the order shown in the ES5 standard (Jan 2011,
-     // pp.110-111) under Section 15.1.4; performance is irrelevant here.
-        Object, Function, Array, String, Boolean, Number, Date, RegExp,
-        Error, EvalError, RangeError, ReferenceError, SyntaxError, TypeError,
-        URIError,
-     // This is a type I have defined in this closure itself, and ...
-        Duck,
-     // ... these are some "types" whose behavior isn't well-defined yet.
-        null, undefined
-    ];
-
-    index_of = function (x) {
-        var i = a$indexOf(x, known_types);
-        return {
-            special:    (i !== -1),
-            index:      (i !== -1) ? i : index_of(x.constructor).index
-        };
-    };
-
     q = global.chassis = function chassis(f) {
         if (typeof f === 'function') {
             stack.unshift(f);
@@ -325,9 +169,6 @@ esac
             throw new Error("Web Chassis expects functions as arguments.");
         }
     };
-
-    q.duck = duck;
-    q.generic = generic;
 
     revive = function () {
         var counter, func, n;
@@ -354,6 +195,20 @@ esac
 
  // Because JS functions are also objects, we can use Chassis itself as an
  // object in which we may store related properties, methods, and data :-)
+
+    q.detects = function (property) {
+     // This is a memoized lazy-loading function for feature detection :-)
+        var cache = {};
+        q.detects = function (property) {
+            if (cache.hasOwnProperty(property) === false) {
+                cache[property] = (global[property]) ? true : false;
+            }
+            return cache[property];
+        };
+     // Some special values ...
+        q.detects.module = (typeof module === 'object');
+        return q.detects(property);
+    };
 
     q.die = function (message) {
         throw new TryAgainLater(message);
@@ -430,21 +285,7 @@ esac
         }
         return available;
     };
-
-    q.detects = function (property) {
-     // This is a memoized lazy-loading function for feature detection :-)
-        var cache = {};
-        q.detects = function (property) {
-            if (cache.hasOwnProperty(property) === false) {
-                cache[property] = (global[property]) ? true : false;
-            }
-            return cache[property];
-        };
-     // Some special values ...
-        q.detects.module = (typeof module === 'object');
-        return q.detects(property);
-    };
-
+    
     q.platform = (function () {
      // This anonymous closure can probably be removed later ...
         if (q.detects("location")) {
@@ -505,7 +346,7 @@ esac
         q.puts = function () {
             global.print(Array.prototype.join.call(arguments, " "));
         };
-     // q.read = function (uri) { ... } //- comming soon ...
+     // q.read = function (uri) { ... } //- comming soon ???
         if (q.detects("scriptArgs")) {
             q.argv = global.scriptArgs;
             break;

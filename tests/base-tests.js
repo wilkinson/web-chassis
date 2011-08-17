@@ -62,7 +62,7 @@ chassis(function (q) {
 
     genericTest = function () {
         var f, result;
-        f = q.generic();
+        f = q.base$generic();
         try {
             f.apply(this, arguments).def = function () {
                 return x;
@@ -74,11 +74,11 @@ chassis(function (q) {
     };
 
     hasTypedPropertyTest = function (x, type, name) {
-        return q.duck(x).has(type, name);
+        return q.base$duck(x).has(type, name);
     };
 
     isArrayLikeTest = function (x) {
-        return q.duck(x).isArrayLike();
+        return q.base$duck(x).isArrayLike();
     };
 
     mapTest = function (x) {
