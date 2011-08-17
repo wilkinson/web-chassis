@@ -31,7 +31,7 @@ reset:
 	@   $(call contingent, clear)
 
 run:
-	@   $(call run-each)
+	@   $(call run-each) 2>/dev/null    #-  hides the warnings :-P
 
 ###
 
