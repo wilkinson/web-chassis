@@ -1,4 +1,9 @@
 NOTES:
+    -   For lab meeting on 17 Aug 2011 --
+        -   Chrome console --> console.dir --> dir(this) // :-)
+        -   ES5 demonstrations
+        -   Vim syntax file
+
     -   I need to read the ES5 standard more closely!
         -   arguments objects now have map and reduce methods I never noticed
 

@@ -44,7 +44,8 @@ else
     WCI_scriptpath="$0";                #-  user ran this from an absolute path
 fi
 
-WCI_chassisjs="${WCI_scriptpath%\/*}/../bin/web-chassis.js"
+WCI_rootdir="${WCI_scriptpath%\/*}/..";
+WCI_chassisjs="${WCI_rootdir}/bin/web-chassis.js";
 
 #-  Now, we'll simply ask for input at the prompt and act accordingly. There's
 #   no real reason for sophisticated privileges checks or failsafes, because
@@ -64,8 +65,11 @@ fi
 printf '%s' "Target destination [${WCI_jstarget}]: ";
 read RESPONSE;
 
-cp -f "${WCI_chassisjs}" \
-        "${RESPONSE:=${WCI_jstarget}}" >/dev/null 2>&1;
+if [ ${#RESPONSE} -eq 0 ]; then
+    RESPONSE="${WCI_jstarget}";
+fi
+
+cat ${WCI_chassisjs} ${WCI_rootdir}/lib/*.js > ${RESPONSE};
 
 if [ $? -eq 0 ]; then
     chmod u+x "${RESPONSE}";
