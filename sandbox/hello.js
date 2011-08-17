@@ -13,7 +13,6 @@
 chassis(function (q) {
     "use strict";
 
-    q.lib("base") || q.die();
     q.lib("demo") || q.die();
 
     q.include("demo");
@@ -25,8 +24,6 @@ chassis(function (q) {
 
 chassis(function (q) {
     "use strict";
-
-    q.lib("base") || q.die();
 
     q.demo = function () {
 

@@ -15,37 +15,37 @@ chassis(function (q) {
 
     (function (x) {
 
-        print(x++, arguments[0]);       //> 1 2     1 1
+        q.puts(x++, arguments[0]);      //> 1 2     1 1
 
     }(1));
 
     (function (x) {
 
-        print(++x, arguments[0]);       //> 2 2     2 1
+        q.puts(++x, arguments[0]);      //> 2 2     2 1
 
     }(1));
 
     (function (x) {
 
-        print(x, arguments[0]++);       //> 1 1     1 1
+        q.puts(x, arguments[0]++);      //> 1 1     1 1
 
     }(1));
 
     (function (x) {
 
-        print(x, ++arguments[0]);       //> 1 2     1 2
+        q.puts(x, ++arguments[0]);      //> 1 2     1 2
 
     }(1));
 
     (function (x) {
 
-        print(--x, ++arguments[0]);     //> 0 1     0 2
+        q.puts(--x, ++arguments[0]);    //> 0 1     0 2
 
     }(1));
 
     (function (x) {
 
-        print(x++, --arguments[0]);     //> 1 1     1 0
+        q.puts(x++, --arguments[0]);    //> 1 1     1 0
 
     }(1));
 

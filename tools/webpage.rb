@@ -240,7 +240,6 @@ def webpage(options)
         this.manana = function () {
             chassis(function (q, global) {
                 "use strict";
-                q.lib("base") || q.die();
                 var scripts, me;
                 me = document.getElementById("manana");
                 scripts = [
@@ -249,9 +248,9 @@ def webpage(options)
                     ('    "' + f[:js].join(padding) + '"') if f[:js].length > 0
                 }
                 ];
-                q.ply(scripts).by(function (key, val) {
-                    q.load(val);
-                });
+                while (scripts.length > 0) {
+                    q.load(scripts.shift());
+                }
                 delete global.manana;                   //- deletes function
                 me.parentNode.removeChild(me);          //- deletes script
             });

@@ -30,12 +30,11 @@ chassis(function (q) {
 
  // Prerequisites
 
-    q.lib("base") || q.die();
     q.lib("lala") || q.die();
     q.lib("lele") || q.die();
 
     if (q.flags.debug === true) {
-        q.puts("--> found base, lala, lele");
+        q.puts("--> found lala, lele");
     }
 
  // Module definition
@@ -63,11 +62,10 @@ chassis(function (q) {
 
  // Prerequisites
 
-    q.lib("base") || q.die();
     q.lib("lele") || q.die();
 
     if (q.flags.debug === true) {
-        q.puts("--> found base, lele");
+        q.puts("--> found lele");
     }
 
  // Module definition
@@ -95,13 +93,7 @@ chassis(function (q) {
 chassis(function (q) {
     "use strict";
 
- // Prerequisites
-
-    q.lib("base") || q.die("--> awaiting base");
-
-    if (q.flags.debug === true) {
-        q.puts("--> found base");
-    }
+ // Prerequisites (n/a)
 
  // Module definition
 

@@ -62,7 +62,7 @@ chassis(function (q) {
 
     genericTest = function () {
         var f, result;
-        f = q.base$generic();
+        f = q.generic();
         try {
             f.apply(this, arguments).def = function () {
                 return x;
@@ -99,13 +99,13 @@ chassis(function (q) {
     };
 
     reduceTest = function (x) {
-        return q.reduce(x).using(function (a, b) {
+        return q.base$reduce(x).using(function (a, b) {
             return a + b;
         });
     };
 
     zipTest = function (x, y) {
-        return q.zip([x, y]).using(function (a, b) {
+        return q.base$zip([x, y]).using(function (a, b) {
             return a + b;
         });
     };

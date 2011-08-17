@@ -23,7 +23,7 @@ chassis(function (q) {
 
     q.flags.digits = 1;
 
- // Demonstration
+ // Demonstrations
 
     q.puts(parseInt(x));                //> 0
     q.puts(parseFloat(x));              //> 9
@@ -31,6 +31,13 @@ chassis(function (q) {
  // Revert the global parameter to its previous state.
 
     q.flags.digits = temp;
+
+});
+
+chassis(function (q) {
+    "strict me not!";
+
+    q.puts("09 - 010 =", 09 - 010);     //> 1
 
 });
 
