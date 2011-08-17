@@ -85,7 +85,7 @@ case ${SHORTJS:=:} in
         exec ${JS} --strict_mode ${Q} -- ${Q} ${ARGV};
         ;;
     js)                                 #-  Mozilla SpiderMonkey 1.8.5+
-        exec ${JS} -U ${Q} ${ARGV};     #   --> "-m -j" enables JIT compilers
+        exec ${JS} -U ${Q} ${Q} ${ARGV};#   --> "-m -j" enables JIT compilers
         ;;
     jsc)                                #-  JavaScriptCore developer shell
         exec ${JS} ${Q} -- ${Q} ${ARGV};
@@ -348,7 +348,7 @@ esac
         };
      // q.read = function (uri) { ... } //- comming soon ???
         if (q.detects("scriptArgs")) {
-            q.argv = global.scriptArgs;
+            q.argv = Array.prototype.slice.call(global.scriptArgs, 1);
             break;
         }
         if (q.detects("arguments")) {
