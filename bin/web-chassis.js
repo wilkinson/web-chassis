@@ -170,6 +170,9 @@ esac
                     func.call(this, q, global);
                 } catch (err) {
                     if (err instanceof TryAgainLater) {
+                        if (q.flags.debug) {
+                            q.puts("Dying ...", err);
+                        }
                         queue.push(func);
                     } else {
                         q.puts(err);
@@ -263,7 +266,10 @@ esac
                  // We will set it to 'null' to try to avoid running it again
                  // later, but it may end up running more than once this time,
                  // since JS may or may not block if/when 'revive' recurses.
-                    q[libname].call(null);
+                 // I am invoking it in a strange way to enable a CommonJS-ish
+                 // API -- you can now append to "this" or "exports" (if you
+                 // name your first argument "exports").
+                    q[libname].call(q, q);
                     defineProperty(q, libname, {
                         configurable: true,
                         enumerable: true,
