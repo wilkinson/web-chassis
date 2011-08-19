@@ -1,10 +1,7 @@
 #-  Ruby source code
 
 #-  blastoff.rb ~~
-#
-#   A port of 'blastoff.js' into Ruby that uses my "onload" pattern :-)
-#
-#                                                           ~~ SRW, 21 Jun 2011
+#                                                       ~~ (c) SRW, 18 Aug 2011
 
 def main(argv)
 

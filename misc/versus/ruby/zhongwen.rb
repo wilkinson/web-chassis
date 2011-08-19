@@ -1,7 +1,7 @@
 #-  Ruby source code
 
 #-  zhongwen.rb ~~
-#                                                           ~~ SRW, 21 Jun 2011
+#                                                       ~~ (c) SRW, 18 Aug 2011
 
 def main(argv)
 

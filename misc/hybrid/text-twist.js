@@ -46,7 +46,7 @@ chassis(function (q) {
 
  // Prerequisites
 
-    q.lib("base") || q.die();
+    q.lib("base");
 
  // Declarations
 

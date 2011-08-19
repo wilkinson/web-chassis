@@ -23,7 +23,7 @@
 #   version that uses the Web Chassis framework directly. This version is kind
 #   of flaky anyway due to name changes and such.
 #
-#                                                           ~~ SRW, 14 Aug 2011
+#                                                       ~~ (c) SRW, 18 Aug 2011
 
 require "optparse"
 
@@ -230,6 +230,11 @@ def webpage(options)
         pre {
             text-align: left;
         }
+        textarea {
+            font-family: Courier, monospace;
+            font-size: 12pt;
+            text-align: left;
+        }
     </style>
     EOF
         ).strip()
@@ -238,6 +243,39 @@ def webpage(options)
     manana = <<-EOF
 <script id="manana">
         this.manana = function () {
+            "use strict";
+            if (typeof window.console !== 'object') {
+                (function (form) {
+                    var runButton, textarea;
+                    runButton = document.createElement("input");
+                    textarea  = document.createElement("textarea");
+                    runButton.onclick = function () {
+                        try {
+                            eval(textarea.value);
+                        } catch (err) {
+                            alert(err);
+                        } finally {
+                         // Uncomment this to refresh the page automatically.
+                         //location.reload(true);
+                        }
+                    };
+                    runButton.type = "button";
+                    runButton.value = "Run";
+                    textarea.autofocus = true;
+                    textarea.cols = 80;
+                    textarea.rows = 24;
+                    form.appendChild(textarea);
+                    form.appendChild(document.createElement("br"));
+                    form.appendChild(document.createElement("br"));
+                    form.appendChild(runButton);
+                    document.body.appendChild(form);
+                }(document.createElement("form")));
+            } else {
+                (function (div) {
+                    div.innerHTML += "Check the developer console for output.";
+                    document.body.appendChild(div);
+                }(document.createElement("div")));
+            }
             chassis(function (q, global) {
                 "use strict";
                 var scripts, me;
@@ -254,7 +292,7 @@ def webpage(options)
                 delete global.manana;                   //- deletes function
                 me.parentNode.removeChild(me);          //- deletes script
             });
-        };
+        }
     </script>
     EOF
 
@@ -267,7 +305,7 @@ def webpage(options)
 
     This was generated dynamically by a Ruby script :-)
 
-                                                            ~~ SRW, #{today}
+                                                        ~~ (c) SRW, #{today}
 -->
 <html lang="en">
   <head>
@@ -279,7 +317,7 @@ def webpage(options)
   <body>
     <noscript>This page requires JavaScript.</noscript>
     #{f[:imgs].length > 0 ? f[:imgs].join("\n    ") : "<!-- (no images) -->"}
-    #{# This will take a second ...
+    #{# Web Chassis should be included?
         if f[:chassis] then
             if f[:js].length > 0 then
                 manana + "    " + '<script src="' + f[:chassis] +

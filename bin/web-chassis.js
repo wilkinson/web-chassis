@@ -71,7 +71,7 @@ ENVJS=${JS};
 JS=$(available ${JS} js jsc d8 v8 node rhino ringo narwhal);
 SHORTJS="${JS##*\/}";
 Q=$0;
-ARGV="$*";
+ARGV="$0 $*";
 
 if [ -n "${ENVJS}" ] && [ -n "${JS}" ]; then
     if [ "${ENVJS}" != "${JS}" ] && [ "${ENVJS}" != "${SHORTJS}" ]; then
@@ -82,22 +82,22 @@ fi
 case ${SHORTJS:=:} in
   # Explicit rules to enable features that should have been on by default ...
     d8)                                 #-  Google V8 debugging shell
-        exec ${JS} --strict_mode ${Q} -- ${Q} ${ARGV};
+        exec ${JS} --strict_mode ${Q} -- ${ARGV};
         ;;
-    js)                                 #-  Mozilla SpiderMonkey 1.8.5+
-        exec ${JS} -U ${Q} ${ARGV};     #   --> "-m -j" enables JIT compilers
+    js)                                 #-  Mozilla SpiderMonkey 1.8 or later
+        exec ${JS} ${Q} ${ARGV};        #   For 1.8.5+, "-m -j -U" --> JIT+UTF8
         ;;
     jsc)                                #-  JavaScriptCore developer shell
-        exec ${JS} ${Q} -- ${Q} ${ARGV};
+        exec ${JS} ${Q} -- ${ARGV};
         ;;
     node)                               #-  Node.js
-        exec ${JS} ${Q} ${ARGV} --v8-options --strict_mode;
+        exec ${JS} ${ARGV} --v8-options --strict_mode;
         ;;
     rhino)                              #-  Mozilla Rhino 1.7 release 3 2011
-        exec ${JS} -encoding utf8 ${Q} ${Q} ${ARGV};
+        exec ${JS} -encoding utf8 ${Q} ${ARGV};
         ;;
     v8)                                 #-  Google V8 sample shell
-        exec ${JS} --strict_mode -e "scriptArgs = ('${ARGV}'.split(' '))" ${Q};
+        exec ${JS} --strict_mode -e "arguments = ('${ARGV}'.split(' '))" ${Q};
         ;;
   # Last resort rules
     :)                                  #-  No [known] ${JS} available
@@ -106,12 +106,12 @@ case ${SHORTJS:=:} in
             '/System/Library/Frameworks/JavaScriptCore.framework' \
             '/Versions/Current/Resources/jsc'`";
         if [ `available ${JS}` ]; then
-            alert "Using ${JS} ..." && exec ${JS} ${Q} -- ${Q} ${ARGV};
+            alert "Using ${JS} ..." && exec ${JS} ${Q} -- ${ARGV};
         fi
         alert 'No JS engine found.' && exit 1;
         ;;
     *)                                  #-  No explicit rule for ${JS}
-        exec ${JS} ${Q} ${ARGV};
+        exec ${JS} ${ARGV};
         ;;
 esac
 
@@ -138,28 +138,9 @@ esac
 
  // Private declarations
 
-    var a$ply, q, revive, stack;
+    var q, revive, stack;
 
  // Private definitions
-
-    a$ply = function (x, f) {
-        if (typeof Array.prototype.forEach === 'function') {
-            a$ply = function (x, f) {
-                Array.prototype.forEach.call(x, function (val, key) {
-                    f(key, val);
-                });
-            };
-        } else {
-            a$ply = function (x, f) {
-                var i, n;
-                n = x.length;
-                for (i = 0; i < n; i += 1) {
-                    f(i, x[i]);
-                }
-            };
-        }
-        a$ply(x, f);
-    };
 
     q = global.chassis = function chassis(f) {
         if (typeof f === 'function') {
@@ -214,10 +195,7 @@ esac
         throw new TryAgainLater(message);
     };
 
-    q.flags = {
-        debug:  false,
-        digits: 5
-    };
+    q.flags = {};
 
     q.include = function (libname) {    //- see also: http://goo.gl/2h4m
         var loaded = {};
@@ -226,119 +204,149 @@ esac
              // The module has already been loaded -- no work necessary :-)
                 return;
             }
-            var re = new RegExp("^" + libname + "\\$(.+)$");
-            a$ply(Object.keys(q), function (key, val) {
-                if (re.test(val) === true) {
-                    q[val.match(re)[1]] = q[val];
+            var key, re;
+            re = new RegExp("^" + libname + "\\$(.+)$");
+            for (key in q) {
+                if (q.hasOwnProperty(key) && re.test(key)) {
+                    q[key.match(re)[1]] = q[key];
                 }
-            });
+            }
             loaded[libname] = true;
         };
         q.include(libname);
     };
 
     q.lib = function (libname) {
-        var available = true;
-        if (q.hasOwnProperty(libname)) {
-            switch (typeof q[libname]) {
-            case "function":
-             // Lazy-load it, then redefine it as null in an effort to avoid
-             // re-running it later. Unfortunately, it may still run twice or
-             // more under certain conditions because JS may or may not block
-             // _all_ execution when 'revive' recurses.
-                q[libname].call(null);
-                Object.defineProperty(q, libname, {
-                    configurable: true,
-                    enumerable: true,
-                    writable: true,
-                    value: null
-                });
-                break;
-            case "undefined":
-                available = false;
-                break;
-            default:
-             // Otherwise, it has already been loaded; we'll check to be sure.
-                if (q[libname] !== null) {
-                    throw new Error(libname + " is not a valid module.");
-                }
-            }
+        var defineProperty;
+        if (typeof Object.defineProperty === 'function') {
+            defineProperty = Object.defineProperty;
         } else {
-         // It's missing, so we'll leave a setter to trigger a revival.
-            Object.defineProperty(q, libname, {
-                configurable: true,
-                set: function (f) {
-                    if (typeof f === 'function') {
-                        Object.defineProperty(q, libname, {
-                            configurable: true,
-                            enumerable: true,
-                            writable: true,
-                            value: f
-                        });
-                        revive();
-                    } else {
-                        throw new Error("Modules must be functions.");
+            defineProperty = function (obj, key, params) {
+                var each;
+                for (each in params) {
+                    if (params.hasOwnProperty(each)) {
+                        switch (each) {
+                        case "get":
+                            obj.__defineGetter__(key, params[each]);
+                            break;
+                        case "set":
+                            obj.__defineSetter__(key, params[each]);
+                            break;
+                        case "value":
+                            delete obj[key];
+                            obj[key] = params[each];
+                            break;
+                        default:
+                         // (placeholder)
+                        }
                     }
                 }
-            });
-            available = false;
-        }
-        return available;
-    };
-    
-    q.platform = (function () {
-     // This anonymous closure can probably be removed later ...
-        if (q.detects("location")) {
-            return (q.detects("window")) ? "browser" : "webworker";
-        }
-        if (q.detects("process")) {
-            return "nodejs";
-        }
-        if (q.detects("load") && q.detects("print")) {
-            return "dev-shell";
-        }
-        throw new Error("Platform detection failed.");
-    }());
-
-    switch (q.platform) {
-    case "browser":
-        global.window.onunload = function () {
-            delete global.chassis;
-        };
-        q.argv = global.location.search.slice(1).split(",");
-        q.load = function (uri) {
-            var script = global.document.createElement("script");
-            script.src = uri;
-            script.onload = function () {
-                revive();
+                return obj;
             };
-            global.document.body.appendChild(script);
+        }
+        q.lib = function (libname) {
+            var available = true;
+            if (q.hasOwnProperty(libname)) {
+                switch (typeof q[libname]) {
+                case "function":
+                 // The module definition exists and needs to be lazy-loaded.
+                 // We will set it to 'null' to try to avoid running it again
+                 // later, but it may end up running more than once this time,
+                 // since JS may or may not block if/when 'revive' recurses.
+                    q[libname].call(null);
+                    defineProperty(q, libname, {
+                        configurable: true,
+                        enumerable: true,
+                        writable: true,
+                        value: null
+                    });
+                    break;
+                case "undefined":
+                 // A trigger already exists, but no definition has been found.
+                    available = false;
+                    break;
+                default:
+                 // Otherwise, it has already been loaded; we'll make sure.
+                    if (q[libname] !== null) {
+                        throw new Error(libname + " is not a valid module.");
+                    }
+                }
+            } else {
+             // It's missing, so we'll leave a setter to trigger a revival.
+                defineProperty(q, libname, {
+                    configurable: true,
+                    set: function (f) {
+                        if (typeof f === 'function') {
+                            defineProperty(q, libname, {
+                                configurable: true,
+                                enumerable: true,
+                                writable: true,
+                                value: f
+                            });
+                            revive();
+                        } else {
+                            throw new Error("Modules must be functions.");
+                        }
+                    }
+                });
+                available = false;
+            }
+            return (available || q.die());
         };
-        if (q.detects("console")) {
+        return q.lib(libname);
+    };
+
+    if (q.detects("location")) {
+        q.argv = global.location.search.slice(1).split(",");
+        if (q.detects("window")) {
+         // Web Chassis is running inside a web browser -- hooray!
+            q.load = function (uri) {
+                var script = global.document.createElement("script");
+                script.src = uri;
+                script.onload = function () {
+                    revive();
+                };
+                global.document.body.appendChild(script);
+            };
             q.puts = function () {
-                global.console.log(Array.prototype.join.call(arguments, " "));
+                var join = Array.prototype.join;
+                if (q.detects("console")) {
+                    q.puts = function () {
+                        global.console.log(join.call(arguments, " "));
+                    };
+                } else {
+                    q.puts = function () {
+                        var d, f, p;
+                        d = global.document;
+                        p = d.body.appendChild(d.createElement("pre"));
+                        p.innerHTML += join.call(arguments, " ");
+                        d = p = null;
+                    };
+                }
+                q.puts.apply(this, arguments);
+            };
+            global.window.onunload = function () {
+                delete global.chassis;
             };
         } else {
+         // Web Chassis is running inside a Web Worker -- hooray!
+            q.load = function (uri) {
+                global.importScripts(uri);
+                revive();
+            };
             q.puts = function () {
-                var d, f, p;
-                d = global.document;
-                p = d.body.appendChild(d.createElement("pre"));
-                p.innerHTML += Array.prototype.join.call(arguments, " ");
-                d = p = null;
+                global.postMessage(Array.prototype.join.call(arguments, " "));
             };
         }
-        break;
-    case "webworker":
-        q.argv = global.location.search.slice(1).split(",");
-        q.load = function (uri) {
-            global.importScripts(uri);
-            revive();
-        };
-        q.puts = function () {
-            global.postMessage(Array.prototype.join.call(arguments, " "));
-        };
-        break;
-    case "dev-shell":
+    } else if (q.detects("load") && q.detects("print")) {
+     // You're running this in a developer shell, not a browser -- good luck!
+        if (q.detects("scriptArgs")) {
+            q.argv = Array.prototype.slice.call(global.scriptArgs, 1);
+        } else if (q.detects("arguments")) {
+            q.argv = Array.prototype.slice.call(global["arguments"], 1);
+        } else {
+            q.argv = [];
+        }
         q.load = function (uri) {
             global.load(uri);
             revive();
@@ -346,18 +354,8 @@ esac
         q.puts = function () {
             global.print(Array.prototype.join.call(arguments, " "));
         };
-     // q.read = function (uri) { ... } //- comming soon ???
-        if (q.detects("scriptArgs")) {
-            q.argv = global.scriptArgs;
-            break;
-        }
-        if (q.detects("arguments")) {
-            q.argv = Array.prototype.slice.call(global["arguments"], 1);
-        } else {
-            q.argv = [];
-        }
-        break;
-    case "nodejs":
+    } else if (q.detects("process")) {
+     // You're running this in Node.js, not a browser -- good luck!
         global.fs = require("fs");
         global.vm = require("vm");
         q.argv = global.process.argv.slice(2);
@@ -373,58 +371,93 @@ esac
         q.puts = function () {
             global.console.log(Array.prototype.join.call(arguments, " "));
         };
-        break;
-    default:
-        throw new Error("Platform configuration failed.");
+    } else {
+     // Seriously, do contact me so I can add support for your platform, ok?
+        throw new Error("Platform detection failed -- please file a report!");
     }
 
- // To parse arguments consistently, I am using the following conventions:
- //
- // -   arguments look like "[-]*key=value"
- // -   keys are made of typical filesystem characters  (A-Za-z_./0-9).
- // -   values are made of valid "word" characters      (A-Za-z_).
- // -   keys without values map to "key=true".
- //
- // For "special" characters, pass the URL to a JSON file or something ;-)
+ // The formatting conventions here for valid arguments are as follows:
+ // -   an argument looks like "[-][-]key[=value]"                      ;
+ // -   keys are made of typical filesystem characters  (A-Za-z_./0-9)  ;
+ // -   values are made of valid "word" characters      (A-Za-z_)       ;
+ // -   keys without values map to "key=true"                           ; and
+ // -   repeated keys' values will be stored in an array.
 
-    a$ply(q.argv, function (index, arg) {
-        var flag, matches;
+    (function () {
+        var flag, key, i, matches, n, val;
         flag = /^[\-]{0,2}([\w\.\-\/]+)[=]?([\w]*)$/;
-        if (flag.test(arg)) {
-            arg.replace(flag, function (matches, key, val) {
-                if ((val === "true") || (val === "false")) {
-                 // This is an explicit "coercion" from String to Boolean.
-                    q.flags[key] = (val === "true") ? true : false;
+        n = q.argv.length;
+        for (i = 0; i < n; i += 1) {
+            if (flag.test(q.argv[i]) === true) {
+                matches = q.argv[i].match(flag);
+                key = matches[1];
+                val = JSON.parse(matches[2] || true);
+                if (q.flags.hasOwnProperty(key)) {
+                    if (q.flags[key].hasOwnProperty("length")) {
+                        Array.prototype.push.call(q.flags[key], val);
+                    } else {
+                        q.flags[key] = [q.flags[key], val];
+                    }
                 } else {
-                    q.flags[key] = val || true;
+                    q.flags[key] = val;
                 }
-            });
+            }
         }
-    });
+    }());
 
  // We may only load external scripts after processing _all_ input arguments!
 
-    a$ply(Object.keys(q.flags), function (key, val) {
-        if ((/\.js$/).test(val) === true) {
-            q.load(val);
+    (function () {
+        var key, re;
+        re = /\.js$/;
+        for (key in q.flags) {
+            if (q.flags.hasOwnProperty(key) && re.test(key)) {
+                q.load(key);
+            }
         }
-    });
+    }());
 
- // Finally, we'll add the ability to load Chassis as a CommonJS module. It's
- // challenging to detect CommonJS within the confines of ES5 strict mode due
- // to scope chain oddities and other surprises, but we'll try, okay? ;-)
+ // Finally, we'll add the ability to load Web Chassis as a CommonJS module.
+ // To load it interactively, use
+ //     > var chassis = require("./bin/web-chassis.js").init();
 
     if (typeof module === 'object') {
+     // NOTE: This is deliberately written "module" instead of "global.module"
+     // because the 'module' object is often restricted to local scope.
         module.exports.init = function () {
-         // Usage: var q = require("./bin/chassis.js").init();
             return q;
         };
     }
 
-}(function () {
- // JSLint gets upset that I'm not using ES5 strict mode here, but it's my best
- // solution currently. Node.js and RingoJS cause trouble; see "Notes.txt".
-    return (typeof this.global === 'object') ? this.global : this;  // (JSLINT)
-}.call(null)));
+}(function (outer_scope) {
+    "use strict";
+
+ // This strict anonymous closure encapsulates the logic for detecting which
+ // object in the environment should be treated as _the_ global object. It's
+ // not as easy as you might think -- strict mode disables the 'call' method's
+ // default behavior of replacing "null" with the global object. Luckily, we
+ // can work around that by passing a reference to the enclosing scope as an
+ // argument at the same time and testing to see if strict mode has done its
+ // deed. This task is not hard in the usual browser context because we know
+ // that the global object is 'window', but CommonJS implementations such as
+ // RingoJS confound the issue by modifying the scope chain, running scripts
+ // in sandboxed contexts, and using identifiers like "global" carelessly ...
+
+    if (this === null) {
+
+     // Strict mode has captured us, but we already passed a reference :-)
+
+        return (typeof global === 'object') ? global : outer_scope;
+
+    } else {
+
+     // Strict mode isn't supported in this environment, but we still need to
+     // make sure we don't get fooled by Rhino's 'global' function.
+
+        return (typeof this.global === 'object') ? this.global : this;
+
+    }
+
+}.call(null, this)));
 
 //- vim:set syntax=javascript:

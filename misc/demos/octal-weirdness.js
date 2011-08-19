@@ -1,14 +1,14 @@
 //- JavaScript source code
 
 //- octal-weirdness.js ~~
-//                                                          ~~ SRW, 03 Aug 2011
+//                                                      ~~ (c) SRW, 18 Aug 2011
 
 chassis(function (q) {
     "use strict";
 
  // Prerequisites
 
-    q.lib("base") || q.die();
+    q.lib("base");
 
  // Declarations
 
@@ -32,12 +32,8 @@ chassis(function (q) {
 
     q.flags.digits = temp;
 
-});
-
-chassis(function (q) {
-    "strict me not!";
-
-    q.puts("09 - 010 =", 09 - 010);     //> 1
+ // Note the behavior of the following when strict mode is not enabled:
+    //q.puts("09 - 010 =", 09 - 010);     //> 1
 
 });
 

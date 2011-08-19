@@ -1,8 +1,11 @@
 NOTES:
+    -   I have noticed that replacing global prototype methods on native
+        objects potentially allows the extraction of data from a closure.
+        I don't know how much I need to worry about this yet, but because I
+        will ultimately be using these tools in medical contexts, I felt it
+        important to log my concern for future evaluation.
+
     -   For lab meeting on 17 Aug 2011 --
-        -   Chrome console --> console.dir --> dir(this) // :-)
-        -   ES5 demonstrations
-        -   Vim syntax file
 
     -   I need to read the ES5 standard more closely!
         -   arguments objects now have map and reduce methods I never noticed

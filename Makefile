@@ -15,7 +15,7 @@
 #   POSIX-compatible shells (instead of just Bash). I'll get the new wrinkles
 #   ironed out before too much longer :-)
 #
-#                                                           ~~ SRW, 13 Aug 2011
+#                                                       ~~ (c) SRW, 18 Aug 2011
 
 include tools/macros.make
 

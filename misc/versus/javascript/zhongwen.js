@@ -6,7 +6,7 @@
 chassis(function (q) {
     "use strict";
 
-    q.lib("base") || q.die();
+    q.lib("base");
 
     var decoded, message;
 

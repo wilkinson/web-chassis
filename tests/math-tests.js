@@ -1,14 +1,14 @@
 //- JavaScript source code
 
 //- math-tests.js ~~
-//                                                          ~~ SRW, 08 Jul 2011
+//                                                      ~~ (c) SRW, 18 Aug 2011
 
 chassis(function (q) {
     "use strict";
 
-    q.lib("base") || q.die();
-    q.lib("math") || q.die();
-    q.lib("test") || q.die();
+    q.lib("base");
+    q.lib("math");
+    q.lib("test");
 
     q.test$run("math", [
         {

@@ -6,9 +6,9 @@
 chassis(function (q) {
     "use strict";
 
-    q.lib("base")   ||  q.die();
-    q.lib("macro")  ||  q.die();
-    q.lib("test")   ||  q.die();
+    q.lib("base");
+    q.lib("macro");
+    q.lib("test");
 
     q.test$run("macro", [
         {

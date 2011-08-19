@@ -8,9 +8,9 @@ chassis(function (q) {
 
  // Prerequisites
 
-    q.lib("base") || q.die();
-    q.lib("solve") || q.die();
-    q.lib("test") || q.die();
+    q.lib("base");
+    q.lib("solve");
+    q.lib("test");
 
  // Declarations
 

@@ -40,13 +40,11 @@ chassis(function (q) {
 
  // Prerequisites
 
-    q.lib("base") || q.die();
-
-    q.include("base");
+    q.lib("base");
 
  // Declarations
 
-    var basename, files, words;
+    var basename, files, temp, words;
 
  // Definitions
 
@@ -54,22 +52,21 @@ chassis(function (q) {
         return pathname.split('/').pop();
     };
 
-    files = q.filter(q.argv).using(function (each) {
-        var temp = basename(each);
-        return !(/.js$/).test(temp);
+    files = q.base$filter(q.argv).using(function (each) {
+        return !(/.js$/).test(basename(each));
     });
-
-    words = [];
 
  // Invocations
 
-    q.ply(files).by(function (i, file) {
-        var text = read(file).split("\n");
-        q.ply(text).by(function (j, line) {
-            if (line.length === 7) {
-                words.push(line);       //- format is one word per line :-)
-            }
+    temp = q.base$map(files).using(function (file) {
+        var lines = read(file).split("\n");
+        return q.base$filter(lines).using(function (each) {
+            return (each.length === 7);
         });
+    });
+
+    words = q.base$reduce(temp).using(function (a, b) {
+        return a.concat(b);
     });
 
     q.puts(JSON.stringify(words));

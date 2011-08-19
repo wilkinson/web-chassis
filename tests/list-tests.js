@@ -1,16 +1,16 @@
 //- JavaScript source code
 
 //- list-tests.js ~~
-//                                                          ~~ SRW, 26 Jun 2011
+//                                                      ~~ (c) SRW, 18 Aug 2011
 
 chassis(function (q) {
     "use strict";
 
- // Library test: "sets"
+ // Library test: "list"
 
-    q.lib("base") || q.die();
-    q.lib("list") || q.die();
-    q.lib("test") || q.die();
+    q.lib("base");
+    q.lib("list");
+    q.lib("test");
 
     q.test$run("list", [
         {

@@ -1,10 +1,7 @@
-//usr/bin/env falcon $0 $*; exit
+//- Falcon source code
 
 //- hello.fal ~~
-//
-//  The obligatory first program in the Falcon language, tested on Ubuntu Lucid.
-//
-//                                                          ~~ SRW, 12 Jun 2010
+//                                                      ~~ (c) SRW, 18 Aug 2011
 
 (function(arguments)
 

@@ -6,8 +6,6 @@
 chassis(function (q) {
     "use strict";
 
-    q.lib("base") || q.die();
-
     q.puts("Hello world!");
 
 });

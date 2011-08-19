@@ -39,9 +39,7 @@ chassis(function (q) {
 
  // Prerequisites
 
-    q.lib("base") || q.die();
-
-    q.include("base");
+    q.lib("base");
 
  // Declarations
 
@@ -53,12 +51,12 @@ chassis(function (q) {
         return pathname.split('/').pop();
     };
 
-    files = q.filter(q.argv).using(function (each) {
+    files = q.base$filter(q.argv).using(function (each) {
         var temp = basename(each);
         return (!(/.(dat|js)$/).test(temp) && (temp !== "off"));
     });
 
-    text = q.map(files).using(function (each) {
+    text = q.base$map(files).using(function (each) {
      // This is the troublesome part, because I haven't written a portable
      // "read" analog yet; this does work in Spidermonkey and D8, though.
         return read(each).split("\n%\n");

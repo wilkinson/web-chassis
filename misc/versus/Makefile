@@ -17,9 +17,9 @@
 #   they fail gracefully when the programs they correspond to cannot be found.
 #   For now, though, these tests work pretty well :-)
 #
-#                                                           ~~ SRW, 13 Aug 2011
+#                                                       ~~ (c) SRW, 18 Aug 2011
 
-include $(CODEBANK)/src/Make/lib/srw.make
+include ../../tools/macros.make
 
 SHELL   :=  $(call contingent, bash)
 

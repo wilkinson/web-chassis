@@ -11,15 +11,15 @@
 chassis(function (q) {
     "use strict";
 
-    q.lib("lili") || q.die("--> awaiting lili");
+    q.lib("lili");
 
-    if (q.flags.debug === true) {
+    if (q.flags.debug) {
         q.puts("--> found lili");
     }
 
     q.puts(q.lili$message());
 
-    if (q.flags.debug === true) {
+    if (q.flags.debug) {
         q.puts("DONE.");
     }
 
@@ -30,10 +30,10 @@ chassis(function (q) {
 
  // Prerequisites
 
-    q.lib("lala") || q.die();
-    q.lib("lele") || q.die();
+    q.lib("lala");
+    q.lib("lele");
 
-    if (q.flags.debug === true) {
+    if (q.flags.debug) {
         q.puts("--> found lala, lele");
     }
 
@@ -45,13 +45,13 @@ chassis(function (q) {
             return q.lala$message() + q.lele$message() + "lili";
         };
 
-        if (q.flags.debug === true) {
+        if (q.flags.debug) {
             q.puts("--> loaded lili");
         }
 
     };
 
-    if (q.flags.debug === true) {
+    if (q.flags.debug) {
         q.puts("--> defined lili");
     }
 
@@ -62,9 +62,9 @@ chassis(function (q) {
 
  // Prerequisites
 
-    q.lib("lele") || q.die();
+    q.lib("lele");
 
-    if (q.flags.debug === true) {
+    if (q.flags.debug) {
         q.puts("--> found lele");
     }
 
@@ -76,7 +76,7 @@ chassis(function (q) {
             return "lala";
         };
 
-        if (q.flags.debug === true) {
+        if (q.flags.debug) {
             q.puts("--> loaded lala");
             q.puts(q.lala$message());
             q.puts(q.lele$message());
@@ -84,7 +84,7 @@ chassis(function (q) {
 
     };
 
-    if (q.flags.debug === true) {
+    if (q.flags.debug) {
         q.puts("--> defined lala");
     }
 
@@ -103,14 +103,14 @@ chassis(function (q) {
             return "lele";
         };
 
-        if (q.flags.debug === true) {
+        if (q.flags.debug) {
             q.puts("--> loaded lele");
             q.puts(q.lele$message());
         }
 
     };
 
-    if (q.flags.debug === true) {
+    if (q.flags.debug) {
         q.puts("--> defined lele");
     }
 

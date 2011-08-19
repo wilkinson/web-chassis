@@ -9,15 +9,15 @@
 //  embeds a shell script, and because everything is written in a conservative
 //  subset of ES, the tests are as universal as Chassis itself :-)
 //
-//                                                          ~~ SRW, 12 Jun 2011
+//                                                      ~~ (c) SRW, 18 Aug 2011
 
 chassis(function (q) {
     "use strict";
 
  // Library test: base library
 
-    q.lib("base") || q.die();
-    q.lib("test") || q.die();
+    q.lib("base");
+    q.lib("test");
 
     var alo, aof, aon, aor, aos, fo, ro, se, sn, ss, u,
         composeTest, filterTest, genericTest, hasTypedPropertyTest,
@@ -355,8 +355,8 @@ chassis(function (q, global) {
 
  // Library test: base library -- DOM-specific tests
 
-    q.lib("base") || q.die();
-    q.lib("test") || q.die();
+    q.lib("base");
+    q.lib("test");
 
     if (q.detects("window") === false) {
         return;
@@ -388,7 +388,7 @@ chassis(function (q, global) {
 
     q(function (q) {
 
-        q.lib("test") || q.die();
+        q.lib("test");
 
         if (typeof global.jQuery !== 'function') {
             q.die();
