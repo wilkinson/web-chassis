@@ -138,41 +138,51 @@ esac
 
  // Private declarations
 
-    var q, revive, stack;
+    var q, queue;
 
  // Private definitions
 
     q = global.chassis = function chassis(f) {
         if (typeof f === 'function') {
-            stack.unshift(f);
-            revive();
+            queue.unshift(f);
+            queue.revive();
         } else {
             throw new Error("Web Chassis expects functions as arguments.");
         }
     };
 
-    revive = function () {
-        var counter, func, n;
-        counter = 0;
-        n = stack.length;
-        while ((func = stack.shift()) !== undefined) {
-            try {
-                func.call(null, q, global);
-            } catch (err) {
-                if (err instanceof TryAgainLater) {
-                    stack.push(func);
-                } else {
-                    q.puts(err);
-                }
-            }
-            if (counter === n) {
-                break;
-            }
-            counter += 1;
-        }
-    };
+    queue = [];
 
-    stack = [];
+    queue.revive = function () {
+     // NOTE: This works well in everything but Spidermonkey 1.8.5+. Why?!
+        var counter, func, n, original, repeats;
+        original = queue.revive;
+        repeats = 1;
+        queue.revive = function () {
+            repeats += 1;
+        };
+        while (repeats > 0) {
+            counter = 0;
+            n = queue.length;
+            repeats -= 1;
+            while ((func = queue.shift()) !== undefined) {
+                try {
+                    func.call(this, q, global);
+                } catch (err) {
+                    if (err instanceof TryAgainLater) {
+                        queue.push(func);
+                    } else {
+                        q.puts(err);
+                    }
+                }
+                if (counter === n) {
+                    break;
+                }
+                counter += 1;
+            }
+        }
+        queue.revive = original;
+    };
 
  // Because JS functions are also objects, we can use Chassis itself as an
  // object in which we may store related properties, methods, and data :-)
@@ -283,7 +293,7 @@ esac
                                 writable: true,
                                 value: f
                             });
-                            revive();
+                            queue.revive();
                         } else {
                             throw new Error("Modules must be functions.");
                         }
@@ -304,7 +314,7 @@ esac
                 var script = global.document.createElement("script");
                 script.src = uri;
                 script.onload = function () {
-                    revive();
+                    queue.revive();
                 };
                 global.document.body.appendChild(script);
             };
@@ -332,7 +342,7 @@ esac
          // Web Chassis is running inside a Web Worker -- hooray!
             q.load = function (uri) {
                 global.importScripts(uri);
-                revive();
+                queue.revive();
             };
             q.puts = function () {
                 global.postMessage(Array.prototype.join.call(arguments, " "));
@@ -349,7 +359,7 @@ esac
         }
         q.load = function (uri) {
             global.load(uri);
-            revive();
+            queue.revive();
         };
         q.puts = function () {
             global.print(Array.prototype.join.call(arguments, " "));
@@ -365,7 +375,7 @@ esac
                     throw err;
                 }
                 global.vm.createScript(data, uri).runInThisContext();
-                revive();
+                queue.revive();
             });
         };
         q.puts = function () {

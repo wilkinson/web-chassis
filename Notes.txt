@@ -1,4 +1,8 @@
 NOTES:
+    -   JavaScript environments for which Web Chassis doesn't work (yet):
+        -   couchjs,    the Apache CouchDB JavaScript interpreter
+        -   phantomjs,  the headless WebKit command-line tool
+
     -   I have noticed that replacing global prototype methods on native
         objects potentially allows the extraction of data from a closure.
         I don't know how much I need to worry about this yet, but because I

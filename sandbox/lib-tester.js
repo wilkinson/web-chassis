@@ -42,7 +42,7 @@ chassis(function (q) {
     q.lili = function () {
 
         q.lili$message = function () {
-            return q.lala$message() + q.lele$message() + "lili";
+            return q.lala$message() + q.lele$message() + ":lili:";
         };
 
         if (q.flags.debug) {
@@ -73,7 +73,7 @@ chassis(function (q) {
     q.lala = function () {
 
         q.lala$message = function () {
-            return "lala";
+            return ":lala:";
         };
 
         if (q.flags.debug) {
@@ -100,7 +100,7 @@ chassis(function (q) {
     q.lele = function () {
 
         q.lele$message = function () {
-            return "lele";
+            return ":lele:";
         };
 
         if (q.flags.debug) {
