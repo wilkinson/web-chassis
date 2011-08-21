@@ -23,7 +23,7 @@ include ../../tools/macros.make
 
 SHELL   :=  $(call contingent, bash)
 
-CHASSIS :=  $(SHELL) $(PWD)/../../bin/web-chassis.js
+CHASSIS :=  $(SHELL) $(PWD)/../../bin/web-chassis.js $(PWD)/../../lib/base.js
 
 GOCOMP  :=  $(call contingent, 6g)
 GOLINK  :=  $(call contingent, 6l)
@@ -52,7 +52,7 @@ define run-Go
 endef
 
 define run-JavaScript
-    $(CHASSIS) $(wildcard ./javascript/*.js)
+    JS=jsc $(CHASSIS) $(wildcard ./javascript/*.js)
 endef
 
 define run-Perl

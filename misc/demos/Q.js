@@ -13,7 +13,7 @@
 //
 //                                                      ~~ (c) SRW, 19 Aug 2011
 
-chassis(function (chassis) {
+chassis(function (chassis, global) {
     "use strict";
 
  // Definition
@@ -21,7 +21,7 @@ chassis(function (chassis) {
     Array.prototype.Q = function (f) {
         var that = this;
         chassis(function (chassis) {
-            f.call(that, chassis);
+            f.call(that, chassis, global);
         });
     };
 

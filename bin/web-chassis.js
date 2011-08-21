@@ -1,4 +1,4 @@
-/** web-chassis v0.1 ********* BEGIN SHELL SCRIPT ********* >/dev/null 2>&1; #*\
+/** Web Chassis v0.2 ********* BEGIN SHELL SCRIPT ********* >/dev/null 2>&1; #*\
 
 #-  web-chassis.js ~~
 #
@@ -124,6 +124,12 @@ esac
 
 /*jslint indent: 4, maxlen: 80                                                */
 /*global chassis: true, global: true, module: true, require: false            */
+
+/******************************************************************************\
+ *                                                                            *
+ *  (Brief explanation will go here ...)                                      *
+ *                                                                            *
+\******************************************************************************/
 
 (function (global) {                    //- This strict anonymous closure can
     "use strict";                       //  still access the global object :-)
