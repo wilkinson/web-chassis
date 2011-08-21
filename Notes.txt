@@ -9,8 +9,6 @@ NOTES:
         will ultimately be using these tools in medical contexts, I felt it
         important to log my concern for future evaluation.
 
-    -   For lab meeting on 17 Aug 2011 --
-
     -   I need to read the ES5 standard more closely!
         -   arguments objects now have map and reduce methods I never noticed
 
@@ -40,12 +38,6 @@ NOTES:
             Duck.prototype.toNumber = function () {
                 return (new Number(this.raw)).valueOf();
             };
-
-    -   New idea to speed up and slim down Part I:
-        Since Part II defines "base", and we'll 'include' it in Part III, we
-        can go ahead and define some quick iterators like "q.map" etc. in PI
-        and simply overwrite them later. This would perhaps even allow us to
-        use the generic techniques to extend pre-existing routines dynamically.
 
     -   The JIT compilers seem to slow down Spidermonkey, now that I've learned
         how to compile it and write cleaner code ...
@@ -86,10 +78,6 @@ PREVIOUS PREAMBLE:
 
 FEATURE REQUESTS:
 
-    -   I need to revisit the q.load mechanism, because even though Safari 5.1
-        actually supports ES5 methods, it isn't running code out of order like
-        every other JS implementation (including "jsc"!) does ...
-
     -   I need to write some guards for it so that it won't die if it tries to
         load itself, i.e. $ bash bin/web-chassis.js bin/web-chassis.js ...
 
@@ -106,9 +94,6 @@ FEATURE REQUESTS:
     -   Add the ability to use Number.{toExponential,toPrecision} to q.format.
 
     -   Finish the work in generic.registerType regarding Array-Like Objects!!!
-
-    -   Idea for "lib||die", so that JSLint won't keep freaking out on us:
-            var ns = q.lib("base") || q.die(); // ???
 
     -   Is color awareness possible (or necessary) in the terminal?
 
@@ -135,8 +120,6 @@ KNOWN ISSUES:
     -   I am now finding use cases for generics that are curried with my
         "preposition" pattern. The following is one potential solution:
             q.filter(Array)(RegExp).def = function (x1) { ... (x2) ... };
-
-    -   index_of: give "regular" lookup precedence over "special" lookup?
 
     -   I can probably eliminate a lot of the "global." prefixes, when they
         are protected by conditionals that keep other implementations out.

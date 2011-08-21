@@ -42,7 +42,9 @@ define run-experiments
 endef
 
 define run-js-tests
-    $(SHELL) $(CHASSIS) $(QFLAGS) $(LIBS) $(JSTESTS)
+    $(SHELL) $(CHASSIS) $(QFLAGS) $(LIBS) $(JSTESTS)                    ;   \
+    printf '%s\n' ''                                                    ;   \
+    $(SHELL) $(CHASSIS) $(QFLAGS) $(JSTESTS) $(LIBS)
 endef
 
 define run-sh-tests
@@ -84,11 +86,12 @@ check:
                 $(TIME) $(call run-sh-tests, "--help")                  ;   \
                 $(TIME) $(call run-sh-tests, "-v")                      ;   \
                 $(TIME) $(call run-sh-tests, "--version")               ;   \
-                $(TIME) $(call run-sh-tests, $(LIBS) $(JSTESTS))            \
+                $(TIME) $(call run-sh-tests, $(LIBS) $(JSTESTS))        ;   \
+                $(TIME) $(call run-sh-tests, $(JSTESTS) $(LIBS))            \
             )
 
 test:
-	@   $(strip $(TIME) $(call run-js-tests))
+	@   $(strip $(call run-js-tests))
 
 ###
 

@@ -13,7 +13,10 @@
 //
 //                                                      ~~ (c) SRW, 18 Aug 2011
 
-chassis(function (q) {
+/*jslint indent: 4, maxlen: 80 */
+/*global chassis: true */
+
+chassis(function (q, global) {
     "use strict";
 
  // Prerequisites
@@ -22,13 +25,13 @@ chassis(function (q) {
 
     if (q.detects("window")) {
         (function (f) {
-            window.onunload = function () {
+            global.window.onunload = function () {
                 if (typeof f === 'function') {
                     f.apply(this, arguments);
                 }
                 q.run_on_unload = function () {};
             };
-        }(window.onunload));
+        }(global.window.onunload));
     } else {
         q.puts("This demonstration only runs in a browser context.");
         return;
@@ -45,17 +48,17 @@ chassis(function (q) {
 
  // Definitions / Demonstrations / Invocations
 
-    s = document.createElement("script");
+    s = global.document.createElement("script");
     s.innerHTML += 'alert("Goodbye!");';
-    document.body.appendChild(s);
+    global.document.body.appendChild(s);
 
-    x = document.getElementsByTagName("script");
+    x = global.document.getElementsByTagName("script");
 
     y = q.base$map(x).using(function (each) {
         return each.text;
     });
 
-    alert(Array.prototype.join.call(y, "\n"));
+    global.alert(Array.prototype.join.call(y, "\n"));
 
 });
 

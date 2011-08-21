@@ -40,35 +40,33 @@ usage() {
     -*, --*                             all other options pass directly to JS";
     printf '%s %s.\n' 'Full documentation is available online at' \
         'https://web-chassis.googlecode.com';
-    exit $1;
 }
 
 version() {
   # This shell function prints the version number and exits. 
-    printf '%s\n' 'v0.1-pre';
-    exit $1;
+    printf '%s\n' '0.2';
 }
 
 while getopts ":-:hv" option; do
     case "${option}" in
         h)
-            usage 0;
+            usage && exit 0;
             ;;
         v)
-            version 0;
+            version && exit 0;
             ;;
         *)
           # This is a hack so I can fake support for "long options" even
           # though 'getopts' doesn't support them. It deliberately omits
           # a catch for unknown flags; those will pass directly to JS :-)
-            [ ${OPTARG} = help ] && usage 0;
-            [ ${OPTARG} = version ] && version 0;
+            [ ${OPTARG} = help ] && usage && exit 0;
+            [ ${OPTARG} = version ] && version && exit 0;
             ;;
     esac
 done
 
 ENVJS=${JS};
-JS=$(available ${JS} jsc js d8 v8 node rhino ringo narwhal);
+JS=$(available ${JS} js jsc d8 v8 node rhino ringo narwhal);
 SHORTJS="${JS##*\/}";
 Q=$0;
 ARGV="$0 $*";
@@ -122,7 +120,7 @@ esac
  *                                                                            *
 \******************************************************************************/
 
-/*jslint indent: 4, maxlen: 80                                                */
+/*jslint indent: 4, maxlen: 80, nomen: true                                   */
 /*global chassis: true, global: true, module: true, require: false            */
 
 /******************************************************************************\
@@ -161,7 +159,6 @@ esac
     stack2 = [];
 
     revive = function () {
-        revive.depth += 1;
         var func;
         while ((func = stack1.shift()) !== undefined) {
             try {
@@ -170,7 +167,7 @@ esac
                 if (err instanceof TryAgainLater) {
                     stack2.push(func);
                     if (q.flags.debug) {
-                        q.puts(revive.depth, err);
+                        q.puts(err.message);
                     }
                 } else {
                     q.puts(err);
@@ -178,9 +175,7 @@ esac
             }
         }
         Array.prototype.push.apply(stack1, stack2.splice(0, stack2.length));
-        revive.depth -= 1;
     };
-    revive.depth = 0;
 
  // Because JS functions are also objects, we can use Chassis itself as an
  // object in which we may store related properties, methods, and data :-)

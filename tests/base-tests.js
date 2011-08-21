@@ -11,6 +11,9 @@
 //
 //                                                      ~~ (c) SRW, 18 Aug 2011
 
+/*jslint indent: 4, maxlen: 80 */
+/*global chassis: true */
+
 chassis(function (q) {
     "use strict";
 
@@ -65,7 +68,7 @@ chassis(function (q) {
         f = q.base$generic();
         try {
             f.apply(this, arguments).def = function () {
-                return x;
+                return;
             };
         } catch (err) {
             result = err.message;
@@ -362,7 +365,7 @@ chassis(function (q, global) {
         return;
     }
 
-    var killDiv, makeDiv;
+    var divs, killDiv, makeDiv;
 
     killDiv = q.test$killDiv;
     makeDiv = q.test$makeDiv;
@@ -375,7 +378,8 @@ chassis(function (q, global) {
  // test has run, then we will know that the test has failed.
 
     makeDiv("nodelist-test", "Running NodeList test ...");
-    q.base$ply(document.getElementsByTagName("div")).by(function (key, val) {
+    divs = global.document.getElementsByTagNames("div");
+    q.base$ply(divs).by(function (key, val) {
         if (val.id === "nodelist-test") {
             killDiv("nodelist-test");
         }

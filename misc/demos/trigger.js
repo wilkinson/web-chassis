@@ -6,6 +6,8 @@
 chassis(function (q) {
     "use strict";
 
+ // Prerequisites (n/a)
+
  // Declarations
 
     var defineProperty, trigger, x, y, z;
@@ -63,7 +65,7 @@ chassis(function (q) {
         q.puts(y);
     });
 
-    while (x.count = z.shift()) {};     //- this will print 1:8, one line each
+    while (x.count = z.shift()) {}      //- this will print 1:8, one line each
 
 });
 

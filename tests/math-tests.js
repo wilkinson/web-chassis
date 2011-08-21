@@ -3,6 +3,9 @@
 //- math-tests.js ~~
 //                                                      ~~ (c) SRW, 18 Aug 2011
 
+/*jslint indent: 4, maxlen: 80 */
+/*global chassis: true */
+
 chassis(function (q) {
     "use strict";
 
