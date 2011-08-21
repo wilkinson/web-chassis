@@ -144,54 +144,43 @@ esac
 
  // Private declarations
 
-    var q, queue;
+    var q, revive, stack1, stack2;
 
  // Private definitions
 
     q = global.chassis = function chassis(f) {
         if (typeof f === 'function') {
-            queue.unshift(f);
-            queue.revive();
+            stack1.unshift(f);
+            revive();
         } else {
             throw new Error("Web Chassis expects functions as arguments.");
         }
     };
 
-    queue = [];
+    stack1 = [];
+    stack2 = [];
 
-    queue.revive = function () {
-     // NOTE: This works well in everything but Spidermonkey 1.8.5+. Why?!
-        var counter, func, n, original, repeats;
-        original = queue.revive;
-        repeats = 1;
-        queue.revive = function () {
-            repeats += 1;
-        };
-        while (repeats > 0) {
-            counter = 0;
-            n = queue.length;
-            repeats -= 1;
-            while ((func = queue.shift()) !== undefined) {
-                try {
-                    func.call(this, q, global);
-                } catch (err) {
-                    if (err instanceof TryAgainLater) {
-                        if (q.flags.debug) {
-                            q.puts("Dying ...", err);
-                        }
-                        queue.push(func);
-                    } else {
-                        q.puts(err);
+    revive = function () {
+        revive.depth += 1;
+        var func;
+        while ((func = stack1.shift()) !== undefined) {
+            try {
+                func.call(this, q, global);
+            } catch (err) {
+                if (err instanceof TryAgainLater) {
+                    stack2.push(func);
+                    if (q.flags.debug) {
+                        q.puts(revive.depth, err);
                     }
+                } else {
+                    q.puts(err);
                 }
-                if (counter === n) {
-                    break;
-                }
-                counter += 1;
             }
         }
-        queue.revive = original;
+        Array.prototype.push.apply(stack1, stack2.splice(0, stack2.length));
+        revive.depth -= 1;
     };
+    revive.depth = 0;
 
  // Because JS functions are also objects, we can use Chassis itself as an
  // object in which we may store related properties, methods, and data :-)
@@ -305,7 +294,7 @@ esac
                                 writable: true,
                                 value: f
                             });
-                            queue.revive();
+                            revive();
                         } else {
                             throw new Error("Modules must be functions.");
                         }
@@ -313,7 +302,7 @@ esac
                 });
                 available = false;
             }
-            return (available || q.die());
+            return (available || q.die('Awaiting "' + libname + '" ...'));
         };
         return q.lib(libname);
     };
@@ -326,7 +315,7 @@ esac
                 var script = global.document.createElement("script");
                 script.src = uri;
                 script.onload = function () {
-                    queue.revive();
+                    revive();
                 };
                 global.document.body.appendChild(script);
             };
@@ -354,7 +343,7 @@ esac
          // Web Chassis is running inside a Web Worker -- hooray!
             q.load = function (uri) {
                 global.importScripts(uri);
-                queue.revive();
+                revive();
             };
             q.puts = function () {
                 global.postMessage(Array.prototype.join.call(arguments, " "));
@@ -371,7 +360,7 @@ esac
         }
         q.load = function (uri) {
             global.load(uri);
-            queue.revive();
+            revive();
         };
         q.puts = function () {
             global.print(Array.prototype.join.call(arguments, " "));
@@ -387,7 +376,7 @@ esac
                     throw err;
                 }
                 global.vm.createScript(data, uri).runInThisContext();
-                queue.revive();
+                revive();
             });
         };
         q.puts = function () {
