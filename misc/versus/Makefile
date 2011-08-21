@@ -7,17 +7,21 @@
 #   program runs exactly as it would have anyway, but you get some advantages
 #   in portability, automatic dependency resolution, and generic programming.
 #   The programs in each directory implement a common set of "kata" to enable
-#   side-by-side comparison. For instance, the Go language claims compilation
-#   is so fast that "compile-and-run" feels like a scripting language's "run";
-#   these tests help investigate such claims.
+#   side-by-side comparison, but I have deliberately removed the performance
+#   tests -- a programmer's choice of higher-level language usually has more
+#   to do with features, functionality, and convenience than with performance.
+#   I say this because those who choose a language primarily for its speed
+#   should choose low-level languages.
 #
-#   To make things more portable across POSIX shells, I will eventually replace
-#   the use of named pipes with GNU Make macros that expand in the Makefile.
-#   The macros are significantly harder to work with, because I demand that
-#   they fail gracefully when the programs they correspond to cannot be found.
-#   For now, though, these tests work pretty well :-)
+#   Of course, I have included Google's Go language here to throw a wrench into
+#   that argument. It's the only systems language I have encountered that can
+#   rival the convenience of a scripting language in any true sense. Its key
+#   advantage, though, is its speed the _second_ time you need it, which once
+#   again shows why a standing-start single-run performance test is useless.
 #
-#                                                       ~~ (c) SRW, 18 Aug 2011
+#   NOTE: I do still plan to remove named pipes, for POSIX compatibility ...
+#
+#                                                       ~~ (c) SRW, 21 Aug 2011
 
 include ../../tools/macros.make
 
@@ -28,7 +32,7 @@ CHASSIS :=  $(SHELL) $(PWD)/../../bin/web-chassis.js $(PWD)/../../lib/base.js
 GOCOMP  :=  $(call contingent, 6g)
 GOLINK  :=  $(call contingent, 6l)
 
-FALCON  :=  $(call contingent, falcon) -M   #-  suppresses creation of *.fam
+FALCON  :=  $(call contingent, falcon)
 PERL    :=  $(call contingent, perl)
 PYTHON  :=  $(call contingent, python)
 R       :=  $(call contingent, Rscript) #-  [faster] headless interface
@@ -52,7 +56,7 @@ define run-Go
 endef
 
 define run-JavaScript
-    JS=jsc $(CHASSIS) $(wildcard ./javascript/*.js)
+    $(CHASSIS) $(wildcard ./javascript/*.js)
 endef
 
 define run-Perl
@@ -78,7 +82,7 @@ endef
 define run-with-banner
     $(strip \
         $(call hilite, "$(strip $(1)) ...")                             ;   \
-        $(TIME) $(call run-$(strip $(1)))                                   \
+        $(call run-$(strip $(1)))                                           \
     )
 endef
 
@@ -90,6 +94,7 @@ define run-tests
 endef
 
 .PHONY: all clean clobber reset run
+.NOTPARALLEL: ;
 
 all: run
 
@@ -101,41 +106,31 @@ clobber: clean reset
 reset:
 	@   $(call contingent, clear)
 
-run:
-	@   $(call run-with-banner, Falcon)                             ;   \
-            $(call run-with-banner, JavaScript)                         ;   \
+run: clean
+	@   $(call run-with-banner, JavaScript)                         ;   \
             $(call run-with-banner, Perl)                               ;   \
             $(call run-with-banner, Python)                             ;   \
-            $(call run-with-banner, Ruby)
+            $(call run-with-banner, Ruby)                               ;   \
+            $(MAKE) clean
 
 ###
 
 .PHONY: test
 
 test: clean
-	@   $(call run-with-banner, Falcon)
-	@   $(call run-with-banner, Go)
-	@   $(call run-with-banner, JavaScript)
-	@   $(call run-with-banner, Perl)
-	@   $(call run-with-banner, Python)
-	@   $(call run-with-banner, R)
-	@   $(call run-with-banner, Ruby)
-	@   $(call run-with-banner, Tcl)
+	@   $(call run-with-banner, Falcon)                             ;   \
+            $(call run-with-banner, Go)                                 ;   \
+            $(call run-with-banner, JavaScript)                         ;   \
+            $(call run-with-banner, Perl)                               ;   \
+            $(call run-with-banner, Python)                             ;   \
+            $(call run-with-banner, R)                                  ;   \
+            $(call run-with-banner, Ruby)                               ;   \
+            $(call run-with-banner, Tcl)
 	@   $(MAKE) clean
 
 ###
 
 %:
 	@   $(call alert, 'No target "$@" was found.')
-
-#define run-python
-#    $(PYTHON) -c \
-#        'import $(PYSRC:%.py=%,) sys; $(PYSRC:%.py=%.main(sys.argv$;);)';   \
-#    $(RM) $(PYSRC:%.py=%.pyc)
-#endef
-
-#define run-ruby
-#    $(RUBY) -e '$(RBSRC:%.rb=require "./%";)'
-#endef
 
 #-  vim:set syntax=make:

@@ -102,8 +102,11 @@ debug:
 
 ###
 
+#-  Here, I have deliberately put things in a terrible order so that we can
+#   have a better feel for whether the "revive" method is working or not.
+
 $(HTML): $(CHASSIS) $(LIBS) $(SANDBOX) $(JSTESTS)
-	@   $(RUBY) $(HTML5GEN) -o $@ $^
+	@   $(RUBY) $(HTML5GEN) -o $@ $(CHASSIS) $(JSTESTS) $(SANDBOX) $(LIBS)
 
 ###
 

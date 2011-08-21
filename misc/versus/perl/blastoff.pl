@@ -15,6 +15,6 @@
 
     print(countdown(10));
 
-})->(@ARGV);
+}->(@ARGV));
 
 #-  vim:set syntax=perl:

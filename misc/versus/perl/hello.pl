@@ -10,6 +10,6 @@
 
     print("Hello world!\n");
 
-})->(@ARGV);
+}->(@ARGV));
 
 #-  vim:set syntax=perl:

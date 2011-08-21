@@ -16,6 +16,6 @@
 
     print(@decoded, "\n");
 
-})->(@ARGV);
+}->(@ARGV));
 
 #-  vim:set syntax=perl:

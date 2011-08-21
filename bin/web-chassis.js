@@ -68,7 +68,7 @@ while getopts ":-:hv" option; do
 done
 
 ENVJS=${JS};
-JS=$(available ${JS} js jsc d8 v8 node rhino ringo narwhal);
+JS=$(available ${JS} jsc js d8 v8 node rhino ringo narwhal);
 SHORTJS="${JS##*\/}";
 Q=$0;
 ARGV="$0 $*";
@@ -225,7 +225,7 @@ esac
     };
 
     q.lib = function (libname) {
-        var defineProperty;
+        var defineProperty, loaded;
         if (typeof Object.defineProperty === 'function') {
             defineProperty = Object.defineProperty;
         } else {
@@ -252,59 +252,52 @@ esac
                 return obj;
             };
         }
+        loaded = {};
         q.lib = function (libname) {
-            var available = true;
-            if (q.hasOwnProperty(libname)) {
-                switch (typeof q[libname]) {
-                case "function":
-                 // The module definition exists and needs to be lazy-loaded.
-                 // We will set it to 'null' to try to avoid running it again
-                 // later, but it may end up running more than once this time,
-                 // since JS may or may not block if/when 'revive' recurses.
-                 // I am invoking it in a strange way to enable a CommonJS-ish
-                 // API -- you can now append to "this" or "exports" (if you
-                 // name your first argument "exports").
-                    q[libname].call(q, q);
+            switch (loaded[libname]) {
+            case true:
+             // The module definition has already loaded ==> exit early :-)
+                break;
+            case false:
+             // A setter exists, but the module itself is still forthcoming.
+                q.die('Awaiting "' + libname + '" ...');
+                break;
+            default:
+             // No setter exists yet, so we need to make one.
+                loaded[libname] = false;
+                if (q.hasOwnProperty(libname) === false) {
                     defineProperty(q, libname, {
                         configurable: true,
-                        enumerable: true,
-                        writable: true,
-                        value: null
-                    });
-                    break;
-                case "undefined":
-                 // A trigger already exists, but no definition has been found.
-                    available = false;
-                    break;
-                default:
-                 // Otherwise, it has already been loaded; we'll make sure.
-                    if (q[libname] !== null) {
-                        throw new Error(libname + " is not a valid module.");
-                    }
-                }
-            } else {
-             // It's missing, so we'll leave a setter to trigger a revival.
-                defineProperty(q, libname, {
-                    configurable: true,
-                    set: function (f) {
-                        if (typeof f === 'function') {
-                            defineProperty(q, libname, {
-                                configurable: true,
-                                enumerable: true,
-                                writable: true,
-                                value: f
+                        set: function (f) {
+                         // Remove the setter.
+                            //delete q[libname];
+                         // Use Web Chassis to run it in order to ensure it
+                         // loads successfully before we assert that it has
+                         // loaded. We bind to 'q' to mimic CommonJS.
+                            q(function (q) {
+                                f.call(q, q);
+                                loaded[libname] = true;
+                                if (q.flags.debug) {
+                                    q.puts('Loaded "' + libname + '" :-)');
+                                }
+                                revive();
                             });
-                            revive();
-                        } else {
-                            throw new Error("Modules must be functions.");
+                            delete q[libname];
                         }
-                    }
-                });
-                available = false;
+                    });
+                    q.die('Created setter for "' + libname + '" ...');
+                } else {
+                    q(function (q) {
+                        q[libname].call(q, q);
+                        loaded[libname] = true;
+                        if (q.flags.debug) {
+                            q.puts('Loaded "' + libname + '" :-)');
+                        }
+                    });
+                }
             }
-            return (available || q.die('Awaiting "' + libname + '" ...'));
         };
-        return q.lib(libname);
+        q.lib(libname);
     };
 
     if (q.detects("location")) {
