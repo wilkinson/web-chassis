@@ -378,7 +378,7 @@ chassis(function (q, global) {
  // test has run, then we will know that the test has failed.
 
     makeDiv("nodelist-test", "Running NodeList test ...");
-    divs = global.document.getElementsByTagNames("div");
+    divs = global.document.getElementsByTagName("div");
     q.base$ply(divs).by(function (key, val) {
         if (val.id === "nodelist-test") {
             killDiv("nodelist-test");

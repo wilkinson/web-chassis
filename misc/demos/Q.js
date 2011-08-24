@@ -16,21 +16,25 @@
 /*jslint indent: 4, maxlen: 80 */
 /*global chassis: true */
 
-chassis(function (chassis, global) {
+chassis(function (q) {
     "use strict";
 
  // Definition
 
-    Array.prototype.Q = function (f) {
+    Object.prototype.Q = function (f) {
         var that = this;
-        chassis(function (chassis) {
-            f.call(that, chassis, global);
+        chassis(function (q, global) {
+            f.call(that, q, global);
         });
     };
 
  // Demonstration
 
     [1, 2, 3, 4, 5].Q(function (q) { q.puts(this); });
+
+    ({a: "lala", e: "lele", i: "lili"}).Q(function (q) { q.puts(this); });
+
+    (function (x) { return x; }).Q(function (q) { q.puts(this); });
 
 });
 

@@ -10,7 +10,9 @@
 #   my own policy is to script and monitor every step of my workflow except
 #   for version control -- always execute your commits manually!
 #
-#                                                       ~~ (c) SRW, 16 Aug 2011
+#   For more information, see hgignore(5).
+#
+#                                                       ~~ (c) SRW, 22 Aug 2011
 
 #-  Vim swap files
 #   -   files that end with '.swp'
@@ -23,6 +25,12 @@
 
 ^\.localized$
 ^\.DS_Store$
+
+#-  CouchApp configuration files for rapid development with CouchDB -- these
+#   may contain unencrypted passwords, so be careful!
+#   -   files named exactly '.couchapprc'
+
+^\.couchapprc$
 
 #-  Google V8 debugging shell ("d8") interactive history files
 #   -   files named exactly '.d8_history'

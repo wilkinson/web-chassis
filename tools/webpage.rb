@@ -312,7 +312,7 @@ def webpage(options)
     <meta charset="utf-8"/>
     <meta name="author" content="Sean Wilkinson"/>
     <title>#{options[:output]}</title>
-    #{f[:css]}
+    #{f[:css].join("\n    ")}
   </head>
   <body>
     <noscript>This page requires JavaScript.</noscript>

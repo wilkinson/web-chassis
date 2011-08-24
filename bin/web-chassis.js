@@ -203,18 +203,16 @@ esac
     q.include = function (libname) {    //- see also: http://goo.gl/2h4m
         var loaded = {};
         q.include = function (libname) {
-            if (loaded[libname] === true) {
-             // The module has already been loaded -- no work necessary :-)
-                return;
-            }
             var key, re;
-            re = new RegExp("^" + libname + "\\$(.+)$");
-            for (key in q) {
-                if (q.hasOwnProperty(key) && re.test(key)) {
-                    q[key.match(re)[1]] = q[key];
+            if (loaded[libname] !== true) {
+                re = new RegExp("^" + libname + "\\$(.+)$");
+                for (key in q) {
+                    if (q.hasOwnProperty(key) && re.test(key)) {
+                        q[key.match(re)[1]] = q[key];
+                    }
                 }
-            }
-            loaded[libname] = true;
+                loaded[libname] = true;
+            };
         };
         q.include(libname);
     };
@@ -258,30 +256,13 @@ esac
                 q.die('Awaiting "' + libname + '" ...');
                 break;
             default:
-             // No setter exists yet, so we need to make one.
+             // This is the first time we've tried to lazy-load the module,
+             // which means we need to check if it exists or if we should wait.
                 loaded[libname] = false;
-                if (q.hasOwnProperty(libname) === false) {
-                    defineProperty(q, libname, {
-                        configurable: true,
-                        set: function (f) {
-                         // Remove the setter.
-                            //delete q[libname];
-                         // Use Web Chassis to run it in order to ensure it
-                         // loads successfully before we assert that it has
-                         // loaded. We bind to 'q' to mimic CommonJS.
-                            q(function (q) {
-                                f.call(q, q);
-                                loaded[libname] = true;
-                                if (q.flags.debug) {
-                                    q.puts('Loaded "' + libname + '" :-)');
-                                }
-                                revive();
-                            });
-                            delete q[libname];
-                        }
-                    });
-                    q.die('Created setter for "' + libname + '" ...');
-                } else {
+                if (q.hasOwnProperty(libname)) {
+                 // If the module already exists, use Web Chassis to run it,
+                 // just in case it has its own internal dependencies. We bind
+                 // to 'q' to provide some support for a CommonJS-ish API.
                     q(function (q) {
                         q[libname].call(q, q);
                         loaded[libname] = true;
@@ -289,6 +270,30 @@ esac
                             q.puts('Loaded "' + libname + '" :-)');
                         }
                     });
+                } else {
+                 // The module doesn't exist yet, so we'll create a setter
+                 // function that will lazy-load it upon assignment so that
+                 // we'll have it available as soon as possible.
+                    defineProperty(q, libname, {
+                        configurable: true,
+                        set: function (f) {
+                         // Remove the setter and assign the module as the
+                         // user expects has already been done.
+                            delete q[libname];
+                            q[libname] = f;
+                         // We use the same simple mechanism as above because
+                         // recursing just to DRY out the code sometimes might
+                         // lead to a race condition in this particular case.
+                            q(function (q) {
+                                q[libname].call(q, q);
+                                loaded[libname] = true;
+                                if (q.flags.debug) {
+                                    q.puts('Loaded "' + libname + '" :-)');
+                                }
+                            });
+                        }
+                    });
+                    q.die('Created setter for "' + libname + '" ...');
                 }
             }
         };
@@ -334,7 +339,7 @@ esac
                 revive();
             };
             q.puts = function () {
-                global.postMessage(Array.prototype.join.call(arguments, " "));
+                global.postMessage(Array.prototype.slice.call(arguments));
             };
         }
     } else if (q.detects("load") && q.detects("print")) {

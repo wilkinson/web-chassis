@@ -1,4 +1,6 @@
 NOTES:
+    -   An "assert" method might make for some useful shorthand ...
+
     -   JavaScript environments for which Web Chassis doesn't work (yet):
         -   couchjs,    the Apache CouchDB JavaScript interpreter
         -   phantomjs,  the headless WebKit command-line tool
