@@ -6,12 +6,13 @@
 #   single-word anagrams from arbitrary character sets by using the built-in
 #   UNIX dictionary as a reference. This program works exceedingly well with
 #   Spidermonkey and D8 at the moment, and I hope to get Narwhal, Node.js,
-#   Rhino, and Ringo working shortly. JavaScriptCore doesn't have a 'read'
+#   Rhino, and RingoJS working shortly. JavaScriptCore doesn't have a 'read'
 #   command, which means its blazing speed is totally useless here. Also, the
 #   V8 sample shell isn't especially helpful here because, if I am reading its
 #   source code correctly, it doesn't actually accept command-line arguments
 #   the way its "--help" printout says it does; I have hacked the invocation
-#   from Chassis accordingly, haha.
+#   from Chassis accordingly, haha. Also, because I get in a hurry sometimes,
+#   I allow for (some) whitespace mistakes.
 #
 #   NOTE: This is NOT hardcoded -- try your own arguments :-)
 #
@@ -21,7 +22,7 @@ command -v chassis >/dev/null 2>&1;
 
 if [ $? -eq 0 ]; then
 
-    for each in d8 js v8; do
+    for each in v8 d8 js; do
         command -v ${each} >/dev/null 2>&1;
         if [ $? -eq 0 ]; then
           # Although it seems pointless to grab the absolute path to
@@ -50,35 +51,21 @@ chassis(function (q) {
 
  // Declarations
 
-    var main, twist;
+    var dictionary, letters, twist;
 
  // Definitions
 
-    main = function (argv) {
-        var dictionary, letters, re;
-        re = /^[A-Za-z]+$/;
-        letters = q.base$filter(argv).using(function (each) {
-            return (re.test(each) === true);
-        });
-        if (letters.length > 0) {
-         // Because I get in a hurry sometimes, I allow for some whitespace
-         // mistakes to occur during entry -- after joining and splitting,
-         // everything will be right as rain anyway :-)
-            letters = letters.join('').split('');
-         // This part unfortunately relies on a native 'read' command right
-         // now, which is why I can't use just any old interpreter [yet] ...
-            dictionary = read("/usr/share/dict/words");
-         // Finally, compute the results and output them to stdout.
-            q.puts("[" + letters + "]", "-->", twist(letters, dictionary));
-        } else {
-            throw new Error("No letters were given.");
-        }
-    };
+    dictionary = read("/usr/share/dict/words");
 
-    twist = function (letters, text) {
+    letters = q.base$filter(q.argv).using(function (each) {
+        var re = /^[A-Za-z]+$/;
+        return (re.test(each) === true);
+    }).join("").split("");
+
+    twist = function (dictionary, letters) {
         var re, words;
         re = new RegExp('[' + letters.join('') + ']{' + letters.length + '}');
-        words = (q.base$trim(text)).split('\n');
+        words = (q.base$trim(dictionary)).split('\n');
         return q.base$filter(words).using(function (word) {
             var str;
          // Are A and B the same dimension?
@@ -99,7 +86,11 @@ chassis(function (q) {
 
  // Invocations
 
-    main(q.argv);
+    if (letters.length === 0) {
+        throw new Error("No letters were given.");
+    }
+
+    q.puts("[" + letters + "]", "-->", twist(dictionary, letters));
 
 });
 

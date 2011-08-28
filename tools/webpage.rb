@@ -180,7 +180,7 @@ def webpage(options)
   # Then, we'll need a default layout if no stylesheets were specified.
 
     if f[:css].length == 0 then
-        f[:css] = (<<-EOF
+        f[:css] = [(<<-EOF
     <style>
         body {
             background-color: #CCCCCC;
@@ -237,7 +237,7 @@ def webpage(options)
         }
     </style>
     EOF
-        ).strip()
+        ).strip()]
     end
 
     manana = <<-EOF

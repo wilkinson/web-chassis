@@ -21,9 +21,8 @@ FORTUNE_DBS="`brew --cellar`/fortune/9708/share/games/fortunes/*";
 for each in d8 js; do
     command -v ${each} >/dev/null 2>&1;
     if [ $? -eq 0 ]; then
-      # Although it seems pointless to grab the absolute path to
-      # 'chassis' in the middle of the invocation, the korn shell
-      # won't work correctly otherwise -- I'm not sure why yet.
+      # Although it seems pointless to grab the absolute path to 'chassis' in
+      # the middle of the invocation, the korn shell won't work correctly ...
         JS=${each} `command -v chassis` $0 "${FORTUNE_DBS}" > fortunes.json;
         echo 'Created "fortunes.json" succesfully.';
         exit 0;

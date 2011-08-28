@@ -19,7 +19,7 @@ else
     exit 1;
 fi
 
-for each in d8 js v8; do
+for each in v8 d8 js; do
     command -v ${each} >/dev/null 2>&1;
     if [ $? -eq 0 ]; then
       # Although it seems pointless to grab the absolute path to

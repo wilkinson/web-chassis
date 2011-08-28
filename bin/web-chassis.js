@@ -66,7 +66,7 @@ while getopts ":-:hv" option; do
 done
 
 ENVJS=${JS};
-JS=$(available ${JS} js jsc d8 v8 node rhino ringo narwhal);
+JS=$(available ${JS} v8 js jsc d8 node rhino ringo narwhal);
 SHORTJS="${JS##*\/}";
 Q=$0;
 ARGV="$0 $*";

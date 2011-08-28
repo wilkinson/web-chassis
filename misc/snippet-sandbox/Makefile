@@ -13,7 +13,7 @@ include $(shell pwd)/../../tools/macros.make
 
 SHELL   :=  $(call contingent, dash sh)
 
-JS      :=  $(call available, js jsc v8 d8 node rhino ringo narwhal)
+JS      :=  $(call available, d8 js jsc narwhal node rhino ringo v8)
 SRC     :=  $(wildcard *.js)
 
 RM      :=  $(call contingent, rm) -rf

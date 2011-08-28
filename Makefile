@@ -48,7 +48,7 @@ define run-js-tests
 endef
 
 define run-sh-tests
-    $(SHELL) $(SHTESTS) $(1)
+    $(SHELL) $(SHTESTS) $(QFLAGS)
 endef
 
 .PHONY: all clean clobber install reset run
@@ -81,14 +81,7 @@ browse: $(HTML)
 	@   $(strip $(YES) | $(OPEN) $(HTML))
 
 check:
-	@   $(strip                                                         \
-                $(TIME) $(call run-sh-tests, "-h")                      ;   \
-                $(TIME) $(call run-sh-tests, "--help")                  ;   \
-                $(TIME) $(call run-sh-tests, "-v")                      ;   \
-                $(TIME) $(call run-sh-tests, "--version")               ;   \
-                $(TIME) $(call run-sh-tests, $(LIBS) $(JSTESTS))        ;   \
-                $(TIME) $(call run-sh-tests, $(JSTESTS) $(LIBS))            \
-            )
+	@   $(strip $(TIME) $(call run-sh-tests))
 
 test:
 	@   $(strip $(call run-js-tests))
