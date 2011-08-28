@@ -4,7 +4,6 @@
 #                                                       ~~ (c) SRW, 09 Aug 2011
 
 (sub {
-
     use strict;
     use warnings;
 

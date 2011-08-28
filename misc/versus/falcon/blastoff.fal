@@ -11,6 +11,6 @@
 
     printl(countdown(10));
 
-end)(args)
+end)(args);
 
 //- vim:set syntax=falcon:

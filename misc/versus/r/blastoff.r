@@ -6,11 +6,7 @@
 (function(argv) {
 
   countdown <- function(n) {
-    if (n == 0) {
-      return("Blastoff!")
-    } else {
-      return(paste(n, "...", countdown(n - 1)))
-    }
+    ifelse(n == 0, "Blastoff!", paste(n, "...", countdown(n - 1)))
   }
 
   cat(countdown(10), "\n", sep = " ")

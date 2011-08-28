@@ -14,8 +14,8 @@ func main() {
 
     flag.Parse()
 
-    message := [...]int {20320, 22909, 21527, 63}
-    decoded := ""
+    var message = [...]int {20320, 22909, 21527, 63}
+    var decoded = ""
 
     for _, val := range message {
         decoded += fmt.Sprintf("%c", val)

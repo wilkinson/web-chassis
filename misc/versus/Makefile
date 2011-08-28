@@ -125,8 +125,8 @@ test: clean
             $(call run-with-banner, Python)                             ;   \
             $(call run-with-banner, R)                                  ;   \
             $(call run-with-banner, Ruby)                               ;   \
-            $(call run-with-banner, Tcl)
-	@   $(MAKE) clean
+            $(call run-with-banner, Tcl)                                ;   \
+            $(MAKE) clean
 
 ###
 

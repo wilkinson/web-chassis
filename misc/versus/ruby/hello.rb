@@ -3,12 +3,10 @@
 #-  hello.rb ~~
 #                                                       ~~ (c) SRW, 18 Aug 2011
 
-def main(argv)
+lambda { |argv|
 
     puts "Hello world!"
 
-end
-
-main(ARGV)
+}.call(ARGV)
 
 #-  vim:set syntax=ruby:

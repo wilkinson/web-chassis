@@ -3,7 +3,7 @@
 #-  blastoff.rb ~~
 #                                                       ~~ (c) SRW, 18 Aug 2011
 
-def main(argv)
+lambda { |argv|
 
     def countdown(n)
         (n <= 0) ? "Blastoff!" : n.to_s + " ... " + countdown(n - 1)
@@ -11,8 +11,6 @@ def main(argv)
 
     puts countdown(10)
 
-end
-
-main(ARGV)
+}.call(ARGV)
 
 #-  vim:set syntax=ruby:

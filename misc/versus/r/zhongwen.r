@@ -6,7 +6,6 @@
 (function(argv) {
 
   message <- c(20320, 22909, 21527, 63)
-
   decoded <- intToUtf8(message, multiple = TRUE)
 
   cat(decoded, "\n", sep = "")

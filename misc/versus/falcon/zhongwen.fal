@@ -6,7 +6,6 @@
 (function(arguments)
 
     message = [20320, 22909, 21527, 63];
-
     decoded = [].comp(message, {each => chr(each)});
 
     printl("".merge(decoded));
