@@ -43,7 +43,7 @@ chassis(function (q) {
 
  // Demonstrations
 
-    q.puts("\u03C0 =", simulate(1000));
+    q.puts("\u03C0", "\u2248", simulate(1000));
 
 });
 
