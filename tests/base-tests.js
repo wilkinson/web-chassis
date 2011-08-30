@@ -77,7 +77,7 @@ chassis(function (q) {
     };
 
     hasTypedPropertyTest = function (x, type, name) {
-        return q.base$duck(x).has(type, name);
+        return q.base$duck(x).has(name, type);
     };
 
     isArrayLikeTest = function (x) {
