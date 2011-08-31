@@ -170,15 +170,9 @@ chassis(function (q) {
         },
         {
             args:   [function Bar() {}],
-            answer: "Unregistered type",
+            answer: "No generic def for given arguments.",
             func:   genericTest,
             name:   "generic: detection of unregistered type (single argument)"
-        },
-        {
-            args:   [function Foo() {}, function Bar() {}],
-            answer: "Unregistered types",
-            func:   genericTest,
-            name:   "generic: detection of unregistered types (multiple)"
         },
         {
             args:   [[]],

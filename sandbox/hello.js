@@ -26,6 +26,9 @@ chassis(function (q) {
 
  // Invocations
 
+    q.puts(new Date(0));
+
+    q.hello();
     q.hello(42);
     q.hello("World");
 
@@ -42,9 +45,13 @@ chassis(function (q) {
 
     q.demo = function () {
 
-        var Duck = q.base$duck(null).constructor;
+        var Duck = q.base$duck().constructor;
 
         q.demo$hello = q.base$generic();
+
+        q.demo$hello(/**/).def = function () {
+            q.puts("Hello world!");
+        };
 
         q.demo$hello(Duck).def = function (x) {
             q.puts("Hello, Duckling!");
