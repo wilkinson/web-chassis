@@ -21,7 +21,9 @@
 #
 #   NOTE: I do still plan to remove named pipes, for POSIX compatibility ...
 #
-#                                                       ~~ (c) SRW, 21 Aug 2011
+#   NOTE: The next program I'd like to add is Monte Carlo approximation of pi.
+#
+#                                                       ~~ (c) SRW, 04 Sep 2011
 
 include ../../tools/macros.make
 
