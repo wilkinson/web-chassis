@@ -35,9 +35,10 @@ GOCOMP  :=  $(call contingent, 6g)
 GOLINK  :=  $(call contingent, 6l)
 
 FALCON  :=  $(call contingent, falcon)
+HASKELL :=  $(call contingent, runhaskell)  #-  nope, we're not compiling ;-)
 PERL    :=  $(call contingent, perl)
 PYTHON  :=  $(call contingent, python)
-R       :=  $(call contingent, Rscript) #-  [faster] headless interface
+R       :=  $(call contingent, Rscript)     #-  use the faster interface
 RUBY    :=  $(call contingent, ruby)
 TCL     :=  $(call contingent, tclsh)
 
@@ -54,6 +55,12 @@ define run-Go
         $(GOCOMP) -o $${each%go}6 $${each}                              ;   \
         $(GOLINK) -o $${each%go}exe $${each%go}6                        ;   \
         $${each%go}exe                                                  ;   \
+    done
+endef
+
+define run-Haskell
+    for each in $(wildcard ./haskell/*.hs); do                              \
+        $(HASKELL) $${each}                                             ;   \
     done
 endef
 
@@ -83,7 +90,7 @@ endef
 
 define run-with-banner
     $(strip \
-        $(call hilite, "$(strip $(1)) ...")                             ;   \
+        $(call hilite, "$(strip $(1))")                                 ;   \
         $(call run-$(strip $(1)))                                           \
     )
 endef
@@ -122,6 +129,7 @@ run: clean
 test: clean
 	@   $(call run-with-banner, Falcon)                             ;   \
             $(call run-with-banner, Go)                                 ;   \
+            $(call run-with-banner, Haskell)                            ;   \
             $(call run-with-banner, JavaScript)                         ;   \
             $(call run-with-banner, Perl)                               ;   \
             $(call run-with-banner, Python)                             ;   \
