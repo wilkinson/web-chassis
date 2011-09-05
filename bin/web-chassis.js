@@ -92,6 +92,7 @@ case ${SHORTJS:=:} in
         exec ${JS} ${ARGV} --v8-options --strict_mode;
         ;;
     rhino)                              #-  Mozilla Rhino 1.7 release 3 2011
+        #exec java -Dfile.encoding=UTF-8 -jar <?> -encoding utf8 ${Q} ${ARGV};
         exec ${JS} -encoding utf8 ${Q} ${ARGV};
         ;;
     v8)                                 #-  Google V8 sample shell

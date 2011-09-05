@@ -1,4 +1,11 @@
 NOTES:
+    -   Figured out where the JVM-based interpreters are having trouble with
+        UTF-8 output: on Mac, Terminal uses UTF-8, but Java defaults to some
+        other crazy encoding (MacRoman, maybe?), and consequently things like
+        the "zhongwen.js" program simply print "????". No good. But, if you
+        specify "-Dfile.encoding=UTF-8", you'll be fine. The trick, though, is
+        that the shims don't always specify that crucial flag ...
+
     -   An "assert" method might make for some useful shorthand ...
 
     -   JavaScript environments for which Web Chassis doesn't work (yet):
