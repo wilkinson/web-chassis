@@ -3,7 +3,11 @@ NOTES:
 
     -   JavaScript environments for which Web Chassis doesn't work (yet):
         -   couchjs,    the Apache CouchDB JavaScript interpreter
+                (because it only takes a single command-line argument)
+        -   jrunscript, the command-line shell bundled with the Java SDK
+                (because it doesn't support getters or setters)
         -   phantomjs,  the headless WebKit command-line tool
+                (because it used to use its own try-again-later hacks)
 
     -   I have noticed that replacing global prototype methods on native
         objects potentially allows the extraction of data from a closure.
