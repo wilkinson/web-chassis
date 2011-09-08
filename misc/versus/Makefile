@@ -34,6 +34,9 @@ CHASSIS :=  $(SHELL) $(PWD)/../../bin/web-chassis.js $(PWD)/../../lib/base.js
 GOCOMP  :=  $(call contingent, 6g)
 GOLINK  :=  $(call contingent, 6l)
 
+JAVA    :=  $(call contingent, java)
+JAVAC   :=  $(call contingent, javac)
+
 FALCON  :=  $(call contingent, falcon)
 HASKELL :=  $(call contingent, runhaskell)  #-  nope, we're not compiling ;-)
 PERL    :=  $(call contingent, perl)
@@ -62,6 +65,16 @@ define run-Haskell
     for each in $(wildcard ./haskell/*.hs); do                              \
         $(HASKELL) $${each}                                             ;   \
     done
+endef
+
+define run-Java
+    pushd `pwd` >/dev/null 2>&1                                         ;   \
+    cd java                                                             ;   \
+    for each in *.java; do                                                  \
+        $(JAVAC) $${each}                                               ;   \
+        $(JAVA) $${each%.java}                                          ;   \
+    done                                                                ;   \
+    popd >/dev/null 2>&1
 endef
 
 define run-JavaScript
@@ -108,7 +121,7 @@ endef
 all: run
 
 clean:
-	@   $(strip $(RM) ./falcon/*.fam ./go/*.6 ./go/*.exe)
+	@   $(strip $(RM) ./falcon/*.fam ./go/*.6 ./go/*.exe ./java/*.class)
 
 clobber: clean reset
 
@@ -130,6 +143,7 @@ test: clean
 	@   $(call run-with-banner, Falcon)                             ;   \
             $(call run-with-banner, Go)                                 ;   \
             $(call run-with-banner, Haskell)                            ;   \
+            $(call run-with-banner, Java)                               ;   \
             $(call run-with-banner, JavaScript)                         ;   \
             $(call run-with-banner, Perl)                               ;   \
             $(call run-with-banner, Python)                             ;   \
