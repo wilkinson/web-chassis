@@ -456,14 +456,10 @@ esac
  // -   repeated keys' values will be stored as an array.
 
     (function () {
-        var flag, key, i, matches, n, val;
-        flag = /^[\-]{0,2}([\w\.\-\/]+)[=]?([\w\.\-\/]*)$/;
-        n = q.argv.length;
-        for (i = 0; i < n; i += 1) {
-            if (flag.test(q.argv[i]) === true) {
-                matches = q.argv[i].match(flag);
-                key = matches[1];
-                switch (matches[2]) {   //- explicit "coercions" ;-)
+        var f, flag, i, n;
+        f = function (x, pattern) {
+            x.replace(pattern, function (matches, key, val) {
+                switch (val) {
                 case "true":
                     val = true;
                     break;
@@ -474,11 +470,7 @@ esac
                     val = true;
                     break;
                 default:
-                    if (parseFloat(matches[2]).toString() === matches[2]) {
-                        val = parseFloat(matches[2]);
-                    } else {
-                        val = matches[2];
-                    }
+                    val = (isNaN(val * 1) === true) ? val : val * 1;
                 }
                 if (q.flags.hasOwnProperty(key)) {
                     if (q.flags[key].hasOwnProperty("length")) {
@@ -489,7 +481,12 @@ esac
                 } else {
                     q.flags[key] = val;
                 }
-            }
+            });
+        };
+        flag = /^[\-]{0,2}([\w\.\-\/]+)[=]?([\w\.\-\/]*)$/;
+        n = q.argv.length;
+        for (i = 0; i < n; i += 1) {
+            f(q.argv[i], flag);
         }
     }());
 
