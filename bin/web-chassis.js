@@ -92,6 +92,7 @@ case ${SHORTJS:=:} in
         exec ${JS} ${ARGV} --v8-options --strict_mode;
         ;;
     rhino)                              #-  Mozilla Rhino 1.7 release 3 2011
+        #exec java -Dfile.encoding=UTF-8 -jar <?> -encoding utf8 ${Q} ${ARGV};
         exec ${JS} -encoding utf8 ${Q} ${ARGV};
         ;;
     v8)                                 #-  Google V8 sample shell
@@ -447,20 +448,30 @@ esac
 
  // The formatting conventions here for valid arguments are as follows:
  // -   an argument looks like "[-][-]key[=value]"                      ;
- // -   keys are made of typical filesystem characters  (A-Za-z_./0-9)  ;
- // -   values are made of valid "word" characters      (A-Za-z_)       ;
- // -   keys without values map to "key=true"                           ; and
- // -   repeated keys' values will be stored in an array.
+ // -   keys and values are made of typical filesystem characters like
+ //         (A-Za-z_./0-9)                                              ;
+ // -   keys without values map to "key=true"                           ;
+ // -   only values whose stringified numeric forms match their initial
+ //     string forms will be treated as numbers                         ; and
+ // -   repeated keys' values will be stored as an array.
 
     (function () {
-        var flag, key, i, matches, n, val;
-        flag = /^[\-]{0,2}([\w\.\-\/]+)[=]?([\w]*)$/;
-        n = q.argv.length;
-        for (i = 0; i < n; i += 1) {
-            if (flag.test(q.argv[i]) === true) {
-                matches = q.argv[i].match(flag);
-                key = matches[1];
-                val = JSON.parse(matches[2] || true);
+        var f, flag, i, n;
+        f = function (x, pattern) {
+            x.replace(pattern, function (matches, key, val) {
+                switch (val) {
+                case "true":
+                    val = true;
+                    break;
+                case "false":
+                    val = false;
+                    break;
+                case "":
+                    val = true;
+                    break;
+                default:
+                    val = (isNaN(val * 1) === true) ? val : val * 1;
+                }
                 if (q.flags.hasOwnProperty(key)) {
                     if (q.flags[key].hasOwnProperty("length")) {
                         Array.prototype.push.call(q.flags[key], val);
@@ -470,7 +481,12 @@ esac
                 } else {
                     q.flags[key] = val;
                 }
-            }
+            });
+        };
+        flag = /^[\-]{0,2}([\w\.\-\/]+)[=]?([\w\.\-\/]*)$/;
+        n = q.argv.length;
+        for (i = 0; i < n; i += 1) {
+            f(q.argv[i], flag);
         }
     }());
 

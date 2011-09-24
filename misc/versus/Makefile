@@ -21,7 +21,9 @@
 #
 #   NOTE: I do still plan to remove named pipes, for POSIX compatibility ...
 #
-#                                                       ~~ (c) SRW, 21 Aug 2011
+#   NOTE: The next program I'd like to add is Monte Carlo approximation of pi.
+#
+#                                                       ~~ (c) SRW, 04 Sep 2011
 
 include ../../tools/macros.make
 
@@ -32,10 +34,14 @@ CHASSIS :=  $(SHELL) $(PWD)/../../bin/web-chassis.js $(PWD)/../../lib/base.js
 GOCOMP  :=  $(call contingent, 6g)
 GOLINK  :=  $(call contingent, 6l)
 
+JAVA    :=  $(call contingent, java)
+JAVAC   :=  $(call contingent, javac)
+
 FALCON  :=  $(call contingent, falcon)
+HASKELL :=  $(call contingent, runhaskell)  #-  nope, we're not compiling ;-)
 PERL    :=  $(call contingent, perl)
 PYTHON  :=  $(call contingent, python)
-R       :=  $(call contingent, Rscript) #-  [faster] headless interface
+R       :=  $(call contingent, Rscript)     #-  use the faster interface
 RUBY    :=  $(call contingent, ruby)
 TCL     :=  $(call contingent, tclsh)
 
@@ -53,6 +59,22 @@ define run-Go
         $(GOLINK) -o $${each%go}exe $${each%go}6                        ;   \
         $${each%go}exe                                                  ;   \
     done
+endef
+
+define run-Haskell
+    for each in $(wildcard ./haskell/*.hs); do                              \
+        $(HASKELL) $${each}                                             ;   \
+    done
+endef
+
+define run-Java
+    pushd `pwd` >/dev/null 2>&1                                         ;   \
+    cd java                                                             ;   \
+    for each in *.java; do                                                  \
+        $(JAVAC) $${each}                                               ;   \
+        $(JAVA) $${each%.java}                                          ;   \
+    done                                                                ;   \
+    popd >/dev/null 2>&1
 endef
 
 define run-JavaScript
@@ -81,7 +103,7 @@ endef
 
 define run-with-banner
     $(strip \
-        $(call hilite, "$(strip $(1)) ...")                             ;   \
+        $(call hilite, "$(strip $(1))")                                 ;   \
         $(call run-$(strip $(1)))                                           \
     )
 endef
@@ -99,7 +121,7 @@ endef
 all: run
 
 clean:
-	@   $(strip $(RM) ./falcon/*.fam ./go/*.6 ./go/*.exe)
+	@   $(strip $(RM) ./falcon/*.fam ./go/*.6 ./go/*.exe ./java/*.class)
 
 clobber: clean reset
 
@@ -120,6 +142,8 @@ run: clean
 test: clean
 	@   $(call run-with-banner, Falcon)                             ;   \
             $(call run-with-banner, Go)                                 ;   \
+            $(call run-with-banner, Haskell)                            ;   \
+            $(call run-with-banner, Java)                               ;   \
             $(call run-with-banner, JavaScript)                         ;   \
             $(call run-with-banner, Perl)                               ;   \
             $(call run-with-banner, Python)                             ;   \

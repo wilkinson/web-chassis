@@ -311,6 +311,12 @@ def webpage(options)
   <head>
     <meta charset="utf-8"/>
     <meta name="author" content="Sean Wilkinson"/>
+   <!--
+    The next tag replaces the default Internet Explorer renderer with Chrome's
+    renderer if the Google Chrome Frame plugin is installed and available. I'm
+    not sure if it causes any side-effects in other cases ...
+   -->
+    <meta http-equiv="X-UA-Compatible" content="chrome=1"/>
     <title>#{options[:output]}</title>
     #{f[:css].join("\n    ")}
   </head>
