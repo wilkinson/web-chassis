@@ -4,6 +4,9 @@ NOTES:
     -   JavaScript environments for which Web Chassis doesn't work (yet):
         -   couchjs,    the Apache CouchDB JavaScript interpreter
         -   phantomjs,  the headless WebKit command-line tool
+        -   Narwhal (version 0, Rhino 1.7 release 3 PRERELEASE 2009 12 12)
+
+        -   jrunscript (because it lacks native JSON ...)
 
     -   I have noticed that replacing global prototype methods on native
         objects potentially allows the extraction of data from a closure.
