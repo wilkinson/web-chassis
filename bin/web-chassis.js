@@ -219,7 +219,7 @@ esac
                     }
                 }
                 loaded[libname] = true;
-            };
+            }
         };
         q.include(libname);
     };
@@ -470,7 +470,7 @@ esac
                     val = true;
                     break;
                 default:
-                    val = (isNaN(val * 1) === true) ? val : val * 1;
+                    val = (isNaN(parseFloat(val))) ? val : parseFloat(val);
                 }
                 if (q.flags.hasOwnProperty(key)) {
                     if (q.flags[key].hasOwnProperty("length")) {
