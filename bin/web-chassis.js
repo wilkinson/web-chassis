@@ -148,7 +148,7 @@ esac
  // Private definitions
 
     q = global.chassis = function chassis(f) {
-        if (typeof f === 'function') {
+        if ((typeof f === 'function') && (f instanceof Function)) {
             stack1.unshift(f);
             revive();
         } else {
