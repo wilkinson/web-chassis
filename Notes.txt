@@ -1,4 +1,7 @@
 NOTES:
+    -   I can add support for "vscript", the tool that comes bundled with the
+        Veracity DVCM, if I add the ability to load 'json2.js' dynamically ...
+
     -   Figured out where the JVM-based interpreters are having trouble with
         UTF-8 output: on Mac, Terminal uses UTF-8, but Java defaults to some
         other crazy encoding (MacRoman, maybe?), and consequently things like
